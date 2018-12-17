@@ -12,3 +12,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.rectangle {
+  border: 1px solid #ff0000;
+  position: absolute;
+}

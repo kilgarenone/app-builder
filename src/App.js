@@ -1,25 +1,31 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { initDraw } from "./draw";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { gridSize: 0 };
+    this.canvas = React.createRef();
+  }
+  componentDidMount() {
+    const gridSize = 1280 / 40;
+    this.setState({ gridSize });
+    initDraw(this.canvas.current);
+  }
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div ref={this.canvas}>
+        <div
+          style={{
+            height: "100vh",
+            backgroundSize: `${this.state.gridSize}px ${this.state.gridSize}px`,
+            backgroundImage:
+              "radial-gradient(circle, #000000 1px, rgba(0, 0, 0, 0) 1px)"
+          }}
+        />
+        {/* <div style={{display: 'grid', gridTemplateColumns: }} */}
       </div>
     );
   }
