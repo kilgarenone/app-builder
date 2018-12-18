@@ -32,9 +32,18 @@ export function initDraw(canvas, gridBoxSize) {
   var element = null;
   canvas.onmousemove = function(e) {
     setMousePosition(e);
+    const snapToGridX = snapToGrid(mouse.x, gridBoxSize);
+    const snapToGridY = snapToGrid(mouse.y, gridBoxSize);
+
     if (element !== null) {
-      element.style.width = Math.abs(mouse.x - mouse.startX) + "px";
-      element.style.height = Math.abs(mouse.y - mouse.startY) + "px";
+      element.style.width =
+        Math.abs(
+          snapToGridX ? snapToGridX - mouse.startX : mouse.x - mouse.startX
+        ) + "px";
+      element.style.height =
+        Math.abs(
+          snapToGridY ? snapToGridY - mouse.startY : mouse.y - mouse.startY
+        ) + "px";
       element.style.left =
         mouse.x - mouse.startX < 0 ? mouse.x + "px" : mouse.startX + "px";
       element.style.top =
@@ -51,7 +60,6 @@ export function initDraw(canvas, gridBoxSize) {
       console.log("begun.");
       mouse.startX = mouse.x;
       mouse.startY = mouse.y;
-      console.log(mouse);
       element = document.createElement("div");
       element.className = "rectangle";
       element.style.left = mouse.x + "px";

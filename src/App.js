@@ -6,13 +6,13 @@ import { initDraw } from "./draw";
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { gridSize: 0 };
+    this.state = { gridBoxSize: 0 };
     this.canvas = React.createRef();
   }
   componentDidMount() {
-    const gridSize = 1280 / 40;
-    this.setState({ gridSize });
-    initDraw(this.canvas.current);
+    const gridBoxSize = window.innerWidth / 40;
+    this.setState({ gridBoxSize });
+    initDraw(this.canvas.current, gridBoxSize);
   }
   render() {
     return (
@@ -20,9 +20,11 @@ class App extends Component {
         <div
           style={{
             height: "100vh",
-            backgroundSize: `${this.state.gridSize}px ${this.state.gridSize}px`,
+            backgroundSize: `${this.state.gridBoxSize}px ${
+              this.state.gridBoxSize
+            }px`,
             backgroundImage:
-              "radial-gradient(circle, #000000 1px, rgba(0, 0, 0, 0) 1px)"
+              "radial-gradient(circle at left top, #000000 1px, rgba(0, 0, 0, 0) 1px)"
           }}
         />
         {/* <div style={{display: 'grid', gridTemplateColumns: }} */}
