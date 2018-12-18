@@ -19,9 +19,10 @@ class App extends Component {
       <div
         style={{
           display: "grid",
-          gridTemplate: `repeat(40, ${this.state.gridBoxSize}) / repeat(40, ${
+          maxHeight: "100vh",
+          gridTemplate: `repeat(40, ${this.state.gridBoxSize}px) / repeat(40, ${
             this.state.gridBoxSize
-          })`
+          }px)`
         }}
         ref={this.canvas}
       >
