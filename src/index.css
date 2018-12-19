@@ -16,3 +16,18 @@ code {
 .rectangle {
   border: 1px solid #ff0000;
 }
+
+.rectangle:hover .drag-anchor {
+  visibility: visible;
+}
+
+.drag-anchor {
+  width: 15px;
+  height: 15px;
+  background-color: black;
+  /* border: 1px solid black; */
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+}

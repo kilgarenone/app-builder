@@ -8,13 +8,14 @@ function snapToGridLine(val, gridBoxSize) {
 }
 
 function snapElementToGrid(element, gridBoxSize) {
-  let top = parseFloat(element.style.top);
-  let left = parseFloat(element.style.left);
-  let width = parseFloat(element.style.width);
-  let height = parseFloat(element.style.height);
+  const top = Math.round(parseFloat(element.style.top) / gridBoxSize);
+  const left = Math.round(parseFloat(element.style.left) / gridBoxSize);
+  const width = Math.round(parseFloat(element.style.width) / gridBoxSize);
+  const height = Math.round(parseFloat(element.style.height) / gridBoxSize);
 
+  const gridColumnStart = left + 1;
+  const gridColumnEnd = left + 1;
   top = gridBoxSize * Math.round(top / gridBoxSize);
-  left = gridBoxSize * Math.round(left / gridBoxSize);
   width = gridBoxSize * Math.round(width / gridBoxSize);
   height = gridBoxSize * Math.round(height / gridBoxSize);
 
@@ -23,14 +24,22 @@ function snapElementToGrid(element, gridBoxSize) {
   element.style["grid-row-start"] = top / gridBoxSize + 1;
   element.style["grid-row-end"] = (top + height) / gridBoxSize + 1;
 
+  // element.setAttribute('data', `grid)
+
+  element.style.position = "relative";
   element.style.top = "";
   element.style.left = "";
   element.style.width = "";
   element.style.height = "";
-  element.style.position = "";
 }
 
-function enableDragAndResize(element, gridBoxSize) {}
+function createDragAnchorElement(element) {
+  const dragAnchor = document.createElement("span");
+  dragAnchor.className = "drag-anchor";
+  element.appendChild(dragAnchor);
+}
+
+function executeDragParentNode(element) {}
 
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
@@ -40,6 +49,8 @@ export function initDraw(canvas, gridBoxSize) {
     startX: 0,
     startY: 0
   };
+
+  let isDragAnchorClicked = false;
 
   function setMousePosition(e) {
     var ev = e || window.event; //Moz || IE
@@ -56,6 +67,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   var element = null;
   canvas.onmousemove = function(e) {
+    console.log(e);
     setMousePosition(e);
     const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
     const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
@@ -73,13 +85,14 @@ export function initDraw(canvas, gridBoxSize) {
         mouse.x - mouse.startX < 0 ? mouse.x + "px" : mouse.startX + "px";
       element.style.top =
         mouse.y - mouse.startY < 0 ? mouse.y + "px" : mouse.startY + "px";
+    } else if (e.target.className === "drag-anchor") {
     }
   };
 
   canvas.onclick = function(e) {
     if (element !== null) {
       snapElementToGrid(element, gridBoxSize);
-      enableDragAndResize(element, gridBoxSize);
+      createDragAnchorElement(element);
       element = null;
       canvas.style.cursor = "default";
       console.log("finsihed.");
