@@ -76,8 +76,9 @@ export function initDraw(canvas, gridBoxSize) {
       console.log(
         `translate3d(${mouse.x + offset[0]}, ${mouse.y + offset[1]}, 0)`
       );
-      e.target.style.transform = `translate3d(${mouse.x +
-        offset[0]}, ${mouse.y + offset[1]}, 0)`;
+      console.log(e);
+      element.style.transform = `translate3d(${mouse.x +
+        offset[0]}px, ${mouse.y + offset[1]}px, 0)`;
     } else if (element !== null) {
       element.style.width =
         Math.abs(
@@ -94,14 +95,20 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
-  canvas.onmousedown = function(e) {
-    e.stopPropagation();
+  canvas.onmouseup = function() {
+    if (isDragAnchorClicked) {
+      isDragAnchorClicked = false;
+      element = null;
+    }
+  };
 
+  canvas.onmousedown = function(e) {
     if (e.target.className === "drag-anchor") {
-      console.log("hello");
+      console.log(e);
       offset[0] = e.target.offsetLeft - mouse.x;
       offset[1] = e.target.offsetTop - mouse.y;
       isDragAnchorClicked = true;
+      element = e.target.parentNode;
     } else if (element !== null) {
       snapElementToGrid(element, gridBoxSize);
       createDragAnchorElement(element);
