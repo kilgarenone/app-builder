@@ -8,16 +8,29 @@ function snapToGridLine(val, gridBoxSize) {
 }
 
 function snapElementToGrid(element, gridBoxSize) {
-  const top = parseFloat(element.style.top);
-  const left = parseFloat(element.style.left);
-  const width = parseFloat(element.style.width);
-  const height = parseFloat(element.style.height);
+  let top = parseFloat(element.style.top);
+  let left = parseFloat(element.style.left);
+  let width = parseFloat(element.style.width);
+  let height = parseFloat(element.style.height);
 
-  element.style.top = gridBoxSize * Math.round(top / gridBoxSize) + "px";
-  element.style.left = gridBoxSize * Math.round(left / gridBoxSize) + "px";
-  element.style.width = gridBoxSize * Math.round(width / gridBoxSize) + "px";
-  element.style.height = gridBoxSize * Math.round(height / gridBoxSize) + "px";
+  top = gridBoxSize * Math.round(top / gridBoxSize);
+  left = gridBoxSize * Math.round(left / gridBoxSize);
+  width = gridBoxSize * Math.round(width / gridBoxSize);
+  height = gridBoxSize * Math.round(height / gridBoxSize);
+
+  element.style["grid-column-start"] = left / gridBoxSize + 1;
+  element.style["grid-column-end"] = (left + width) / gridBoxSize + 1;
+  element.style["grid-row-start"] = top / gridBoxSize + 1;
+  element.style["grid-row-end"] = (top + height) / gridBoxSize + 1;
+
+  element.style.top = "";
+  element.style.left = "";
+  element.style.width = "";
+  element.style.height = "";
+  element.style.position = "";
 }
+
+function enableDragAndResize(element, gridBoxSize) {}
 
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
@@ -66,6 +79,7 @@ export function initDraw(canvas, gridBoxSize) {
   canvas.onclick = function(e) {
     if (element !== null) {
       snapElementToGrid(element, gridBoxSize);
+      enableDragAndResize(element, gridBoxSize);
       element = null;
       canvas.style.cursor = "default";
       console.log("finsihed.");
@@ -77,6 +91,7 @@ export function initDraw(canvas, gridBoxSize) {
       element.className = "rectangle";
       element.style.left = mouse.x + "px";
       element.style.top = mouse.y + "px";
+      element.style.position = "absolute";
       canvas.appendChild(element);
       canvas.style.cursor = "crosshair";
     }
