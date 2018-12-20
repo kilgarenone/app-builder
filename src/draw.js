@@ -1,7 +1,5 @@
 function snapToGridLine(val, gridBoxSize) {
   var snap_candidate = gridBoxSize * Math.round(val / gridBoxSize);
-  console.log(snap_candidate);
-  console.log(snap_candidate);
   if (Math.abs(val - snap_candidate) < 10) {
     return snap_candidate;
   } else {
