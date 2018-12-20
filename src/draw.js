@@ -41,6 +41,10 @@ function createDragAnchorElement(element) {
   element.appendChild(dragAnchor);
 }
 
+function convertGridToPixel(grid, gridBoxSize) {
+  return grid.split("/").map(grid => (grid - 1) * gridBoxSize);
+}
+
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   var mouse = {
@@ -50,8 +54,9 @@ export function initDraw(canvas, gridBoxSize) {
     startY: 0
   };
 
-  const offset = [0, 0];
   let isDragAnchorClicked = false;
+  let offset = [0, 0];
+  var element = null;
 
   function setMousePosition(e) {
     var ev = e || window.event; //Moz || IE
@@ -66,19 +71,14 @@ export function initDraw(canvas, gridBoxSize) {
     }
   }
 
-  var element = null;
   canvas.onmousemove = function(e) {
     setMousePosition(e);
     const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
     const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
 
     if (isDragAnchorClicked) {
-      console.log(
-        `translate3d(${mouse.x + offset[0]}, ${mouse.y + offset[1]}, 0)`
-      );
-      console.log(e);
-      element.style.transform = `translate3d(${mouse.x +
-        offset[0]}px, ${mouse.y + offset[1]}px, 0)`;
+      element.style.transform = `translate3d(${mouse.x -
+        offset[0]}px, ${mouse.y - offset[1]}px, 0)`;
     } else if (element !== null) {
       element.style.width =
         Math.abs(
@@ -99,16 +99,21 @@ export function initDraw(canvas, gridBoxSize) {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
       element = null;
+      offset[0] = 0;
+      offset[1] = 0;
     }
   };
 
   canvas.onmousedown = function(e) {
     if (e.target.className === "drag-anchor") {
-      console.log(e);
-      offset[0] = e.target.offsetLeft - mouse.x;
-      offset[1] = e.target.offsetTop - mouse.y;
-      isDragAnchorClicked = true;
       element = e.target.parentNode;
+      const gridToPixel = convertGridToPixel(element.dataset.grid, gridBoxSize);
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+      offset[0] = mouse.startX;
+      offset[1] = mouse.startY;
+      console.log(offset);
+      isDragAnchorClicked = true;
     } else if (element !== null) {
       snapElementToGrid(element, gridBoxSize);
       createDragAnchorElement(element);
