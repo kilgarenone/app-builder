@@ -1,6 +1,6 @@
 function snapToGridLine(val, gridBoxSize) {
   var snap_candidate = gridBoxSize * Math.round(val / gridBoxSize);
-  if (Math.abs(val - snap_candidate) < 5) {
+  if (Math.abs(val - snap_candidate) < 10) {
     return snap_candidate;
   } else {
     return null;
@@ -45,6 +45,10 @@ function convertGridToPixel(grid, gridBoxSize) {
   return grid.split("/").map(grid => (grid - 1) * gridBoxSize);
 }
 
+function normalizeTransformToGrid(element) {
+  console.log(element.style.transform);
+}
+
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   var mouse = {
@@ -55,7 +59,6 @@ export function initDraw(canvas, gridBoxSize) {
   };
 
   let isDragAnchorClicked = false;
-  let offset = [0, 0];
   var element = null;
 
   function setMousePosition(e) {
@@ -73,13 +76,18 @@ export function initDraw(canvas, gridBoxSize) {
 
   canvas.onmousemove = function(e) {
     setMousePosition(e);
-    const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
-    const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
 
     if (isDragAnchorClicked) {
-      element.style.transform = `translate3d(${mouse.x -
-        offset[0]}px, ${mouse.y - offset[1]}px, 0)`;
+      const snapToGridX = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
+      const snapToGridY = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
+
+      element.style.transform = `translate3d(${
+        snapToGridX ? snapToGridX : mouse.x - mouse.startX
+      }px, ${snapToGridY ? snapToGridY : mouse.y - mouse.startY}px, 0)`;
     } else if (element !== null) {
+      const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
+      const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
+
       element.style.width =
         Math.abs(
           snapToGridX ? snapToGridX - mouse.startX : mouse.x - mouse.startX
@@ -98,21 +106,16 @@ export function initDraw(canvas, gridBoxSize) {
   canvas.onmouseup = function() {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
+      normalizeTransformToGrid(element);
       element = null;
-      offset[0] = 0;
-      offset[1] = 0;
     }
   };
 
   canvas.onmousedown = function(e) {
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
     if (e.target.className === "drag-anchor") {
       element = e.target.parentNode;
-      const gridToPixel = convertGridToPixel(element.dataset.grid, gridBoxSize);
-      mouse.startX = mouse.x;
-      mouse.startY = mouse.y;
-      offset[0] = mouse.startX;
-      offset[1] = mouse.startY;
-      console.log(offset);
       isDragAnchorClicked = true;
     } else if (element !== null) {
       snapElementToGrid(element, gridBoxSize);
@@ -122,11 +125,9 @@ export function initDraw(canvas, gridBoxSize) {
       console.log("finsihed.");
     } else {
       console.log("begun.");
-      mouse.startX = mouse.x;
-      mouse.startY = mouse.y;
       element = document.createElement("div");
       element.className = "rectangle";
-      element.style.left = mouse.x + "px";
+      element.style.left = mouse.x + "px"; // TODO: use translateX and Y instead
       element.style.top = mouse.y + "px";
       element.style.position = "absolute";
       canvas.appendChild(element);
