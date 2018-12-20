@@ -5,7 +5,7 @@ function snapToGridLine(val, gridBoxSize) {
   if (Math.abs(val - snap_candidate) < 10) {
     return snap_candidate;
   } else {
-    return null;
+    return val;
   }
 }
 
@@ -88,22 +88,16 @@ export function initDraw(canvas, gridBoxSize) {
       const snapToGridX = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
 
-      const x = snapToGridX ? snapToGridX : mouse.x - mouse.startX;
-      const y = snapToGridY ? snapToGridY : mouse.y - mouse.startY;
+      const x = snapToGridX;
+      const y = snapToGridY;
 
       element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (element !== null) {
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
 
-      element.style.width =
-        Math.abs(
-          snapToGridX ? snapToGridX - mouse.startX : mouse.x - mouse.startX
-        ) + "px";
-      element.style.height =
-        Math.abs(
-          snapToGridY ? snapToGridY - mouse.startY : mouse.y - mouse.startY
-        ) + "px";
+      element.style.width = Math.abs(snapToGridX - mouse.startX) + "px";
+      element.style.height = Math.abs(snapToGridY - mouse.startY) + "px";
       element.style.left =
         mouse.x - mouse.startX < 0 ? mouse.x + "px" : mouse.startX + "px";
       element.style.top =
