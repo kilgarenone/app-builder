@@ -1,5 +1,7 @@
 function snapToGridLine(val, gridBoxSize) {
   var snap_candidate = gridBoxSize * Math.round(val / gridBoxSize);
+  console.log(snap_candidate);
+  console.log(snap_candidate);
   if (Math.abs(val - snap_candidate) < 10) {
     return snap_candidate;
   } else {
@@ -34,10 +36,6 @@ function createDragAnchorElement(element) {
   const dragAnchor = document.createElement("span");
   dragAnchor.className = "drag-anchor";
   element.appendChild(dragAnchor);
-}
-
-function convertGridToPixel(grid, gridBoxSize) {
-  return grid.split("/").map(grid => (grid - 1) * gridBoxSize);
 }
 
 function getOffsetXandY(element) {
