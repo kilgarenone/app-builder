@@ -23,11 +23,6 @@ function snapElementToGrid(element, gridBoxSize) {
   element.style["grid-row-end"] = gridRowEnd;
   element.style["grid-column-end"] = gridColumnEnd;
 
-  element.setAttribute(
-    "data-grid",
-    `${gridRowStart}/${gridColumnStart}/${gridRowEnd}/${gridColumnEnd}`
-  );
-
   element.style.position = "relative";
   element.style.top = "";
   element.style.left = "";
@@ -45,8 +40,22 @@ function convertGridToPixel(grid, gridBoxSize) {
   return grid.split("/").map(grid => (grid - 1) * gridBoxSize);
 }
 
-function normalizeTransformToGrid(element) {
-  console.log(element.style.transform);
+function getOffsetXandY(element) {
+  return element.style.transform.match(/-?\d+/g);
+}
+
+function normalizeTransformToGrid(element, gridBoxSize) {
+  const offset = getOffsetXandY(element);
+  const offsetGridBoxesX = offset[0] / gridBoxSize;
+  const offsetGridBoxesY = offset[1] / gridBoxSize;
+
+  element.style.gridRowStart = +element.style.gridRowStart + offsetGridBoxesY;
+  element.style.gridColumnStart =
+    +element.style.gridColumnStart + offsetGridBoxesX;
+  element.style.gridRowEnd = +element.style.gridRowEnd + offsetGridBoxesY;
+  element.style.gridColumnEnd = +element.style.gridColumnEnd + offsetGridBoxesX;
+
+  element.style.transform = "";
 }
 
 // adapted from https://stackoverflow.com/a/17409472/73323
@@ -81,9 +90,10 @@ export function initDraw(canvas, gridBoxSize) {
       const snapToGridX = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
 
-      element.style.transform = `translate3d(${
-        snapToGridX ? snapToGridX : mouse.x - mouse.startX
-      }px, ${snapToGridY ? snapToGridY : mouse.y - mouse.startY}px, 0)`;
+      const x = snapToGridX ? snapToGridX : mouse.x - mouse.startX;
+      const y = snapToGridY ? snapToGridY : mouse.y - mouse.startY;
+
+      element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (element !== null) {
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
@@ -106,7 +116,7 @@ export function initDraw(canvas, gridBoxSize) {
   canvas.onmouseup = function() {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
-      normalizeTransformToGrid(element);
+      normalizeTransformToGrid(element, gridBoxSize);
       element = null;
     }
   };
