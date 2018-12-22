@@ -7,11 +7,15 @@ function snapToGridLine(val, gridBoxSize) {
   }
 }
 
+function roundPixelToGridBoxes(pixel, gridBoxSize) {
+  return Math.round(parseFloat(pixel) / gridBoxSize);
+}
+
 function snapElementToGrid(element, gridBoxSize) {
-  const top = Math.round(parseFloat(element.style.top) / gridBoxSize);
-  const left = Math.round(parseFloat(element.style.left) / gridBoxSize);
-  const width = Math.round(parseFloat(element.style.width) / gridBoxSize);
-  const height = Math.round(parseFloat(element.style.height) / gridBoxSize);
+  const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
+  const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
+  const width = roundPixelToGridBoxes(element.style.width, gridBoxSize);
+  const height = roundPixelToGridBoxes(element.style.height, gridBoxSize);
 
   const gridColumnStart = left + 1;
   const gridColumnEnd = left + width + 1;
@@ -42,8 +46,8 @@ function getOffsetXandY(element) {
 
 function normalizeTransformToGrid(element, gridBoxSize) {
   const offset = getOffsetXandY(element);
-  const offsetGridBoxesX = offset[0] / gridBoxSize;
-  const offsetGridBoxesY = offset[1] / gridBoxSize;
+  const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
+  const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
 
   element.style.gridRowStart = +element.style.gridRowStart + offsetGridBoxesY;
   element.style.gridColumnStart =
@@ -83,11 +87,8 @@ export function initDraw(canvas, gridBoxSize) {
     setMousePosition(e);
 
     if (isDragAnchorClicked) {
-      const snapToGridX = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
-      const snapToGridY = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
-
-      const x = snapToGridX;
-      const y = snapToGridY;
+      const x = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
+      const y = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
 
       element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (element !== null) {
