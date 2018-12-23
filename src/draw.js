@@ -129,9 +129,9 @@ export function initDraw(canvas, gridBoxSize) {
       element.style.width = Math.abs(snapToGridX - mouse.startX) + "px";
       element.style.height = Math.abs(snapToGridY - mouse.startY) + "px";
       element.style.left =
-        mouse.x - mouse.startX < 0 ? mouse.x + "px" : mouse.startX + "px";
+        mouse.x - mouse.startX < 0 ? snapToGridX + "px" : mouse.startX + "px";
       element.style.top =
-        mouse.y - mouse.startY < 0 ? mouse.y + "px" : mouse.startY + "px";
+        mouse.y - mouse.startY < 0 ? snapToGridY + "px" : mouse.startY + "px";
     }
   };
 
