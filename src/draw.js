@@ -1,7 +1,7 @@
 function snapToGridLine(val, gridBoxSize) {
-  var snap_candidate = gridBoxSize * Math.round(val / gridBoxSize);
-  if (Math.abs(val - snap_candidate) < 10) {
-    return snap_candidate;
+  const snapCandidate = gridBoxSize * Math.round(val / gridBoxSize);
+  if (Math.abs(val - snapCandidate) < 10) {
+    return snapCandidate;
   } else {
     return val;
   }
@@ -22,10 +22,10 @@ function snapElementToGrid(element, gridBoxSize) {
   const gridRowStart = top + 1;
   const gridRowEnd = top + height + 1;
 
-  element.style["grid-row-start"] = gridRowStart;
-  element.style["grid-column-start"] = gridColumnStart;
-  element.style["grid-row-end"] = gridRowEnd;
-  element.style["grid-column-end"] = gridColumnEnd;
+  element.style.gridRowStart = gridRowStart;
+  element.style.gridColumnStart = gridColumnStart;
+  element.style.gridRowEnd = gridRowEnd;
+  element.style.gridColumnEnd = gridColumnEnd;
 
   element.style.position = "relative";
   element.style.top = "";
@@ -60,7 +60,7 @@ function normalizeTransformToGrid(element, gridBoxSize) {
 
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
-  var mouse = {
+  const mouse = {
     x: 0,
     y: 0,
     startX: 0,
@@ -71,10 +71,10 @@ export function initDraw(canvas, gridBoxSize) {
   let firstClickTimeout;
   let currentContainerId;
   let isDragAnchorClicked = false;
-  var element = null;
+  let element = null;
 
   function setMousePosition(e) {
-    var ev = e || window.event; //Moz || IE
+    const ev = e || window.event; //Moz || IE
     if (ev.pageX) {
       //Moz
       mouse.x = ev.pageX + window.pageXOffset;
@@ -126,12 +126,12 @@ export function initDraw(canvas, gridBoxSize) {
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
 
-      element.style.width = Math.abs(snapToGridX - mouse.startX) + "px";
-      element.style.height = Math.abs(snapToGridY - mouse.startY) + "px";
+      element.style.width = `${Math.abs(snapToGridX - mouse.startX)}px`;
+      element.style.height = `${Math.abs(snapToGridY - mouse.startY)}px`;
       element.style.left =
-        mouse.x - mouse.startX < 0 ? snapToGridX + "px" : mouse.startX + "px";
+        mouse.x - mouse.startX < 0 ? `${snapToGridX}px` : `${mouse.startX}px`;
       element.style.top =
-        mouse.y - mouse.startY < 0 ? snapToGridY + "px" : mouse.startY + "px";
+        mouse.y - mouse.startY < 0 ? `${snapToGridY}px` : `${mouse.startY}px`;
     }
   };
 
