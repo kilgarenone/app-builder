@@ -67,6 +67,9 @@ export function initDraw(canvas, gridBoxSize) {
     startY: 0
   };
 
+  let clicks = 0;
+  let firstClickTimeout;
+  let currentContainerId;
   let isDragAnchorClicked = false;
   var element = null;
 
@@ -81,6 +84,34 @@ export function initDraw(canvas, gridBoxSize) {
       mouse.x = ev.clientX + document.body.scrollLeft;
       mouse.y = ev.clientY + document.body.scrollTop;
     }
+  }
+
+  function createContainer() {
+    if (element !== null) {
+      element.removeAttribute("id");
+      snapElementToGrid(element, gridBoxSize);
+      createDragAnchorElement(element);
+      element = null;
+      canvas.style.cursor = "default";
+      console.log("finsihed.");
+    } else {
+      currentContainerId = Math.random();
+      console.log("begun.");
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+      element = document.createElement("div");
+      element.className = "rectangle";
+      element.id = currentContainerId;
+      element.style.left = mouse.x + "px"; // TODO: use translateX and Y instead
+      element.style.top = mouse.y + "px";
+      element.style.position = "absolute";
+      canvas.appendChild(element);
+    }
+  }
+
+  function destroyContainer() {
+    document.getElementById(currentContainerId).remove();
+    element = null;
   }
 
   canvas.onmousemove = function(e) {
@@ -112,27 +143,34 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
-  canvas.onmousedown = function(e) {
-    mouse.startX = mouse.x;
-    mouse.startY = mouse.y;
-    if (e.target.className === "drag-anchor") {
-      element = e.target.parentNode;
-      isDragAnchorClicked = true;
-    } else if (element !== null) {
-      snapElementToGrid(element, gridBoxSize);
-      createDragAnchorElement(element);
-      element = null;
-      canvas.style.cursor = "default";
-      console.log("finsihed.");
+  canvas.onclick = () => {
+    clicks++;
+    if (clicks === 1) {
+      createContainer();
+      firstClickTimeout = setTimeout(() => {
+        clicks = 0;
+        if (element) {
+          canvas.style.cursor = "crosshair";
+        }
+      }, 300);
     } else {
-      console.log("begun.");
-      element = document.createElement("div");
-      element.className = "rectangle";
-      element.style.left = mouse.x + "px"; // TODO: use translateX and Y instead
-      element.style.top = mouse.y + "px";
-      element.style.position = "absolute";
-      canvas.appendChild(element);
-      canvas.style.cursor = "crosshair";
+      clearTimeout(firstClickTimeout);
+      console.log("double click");
+      destroyContainer();
+      clicks = 0;
+    }
+  };
+
+  canvas.onmousedown = function(e) {
+    if (e.target.className === "drag-anchor") {
+      console.log("Clicked drag anchor ");
+      isDragAnchorClicked = true;
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+      // prevents after onmouseup, the click event won't
+      // bubble up to the canvas's onclick handler
+      e.target.onclick = e => e.stopPropagation();
+      element = e.target.parentNode;
     }
   };
 }
