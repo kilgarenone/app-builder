@@ -17,6 +17,10 @@ code {
   border: 1px solid #ff0000;
 }
 
+.paragraph {
+  height: 50px;
+}
+
 .rectangle:hover .drag-anchor {
   visibility: visible;
 }

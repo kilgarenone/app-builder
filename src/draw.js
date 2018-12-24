@@ -46,6 +46,12 @@ function getOffsetXandY(element) {
 
 function normalizeTransformToGrid(element, gridBoxSize) {
   const offset = getOffsetXandY(element);
+  // might mean double clicked the drag square box without mousemove,
+  // therefore, no transform data is set. if yes, don't access offset
+  // array, otherwise error will be thrown
+  if (!offset) {
+    return;
+  }
   const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
   const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
 
@@ -69,6 +75,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   let clicks = 0;
   let firstClickTimeout;
+  let firstTarget;
   let currentContainerId;
   let isDragAnchorClicked = false;
   let element = null;
@@ -88,30 +95,41 @@ export function initDraw(canvas, gridBoxSize) {
 
   function createContainer() {
     if (element !== null) {
+      /* Clean up the container when clicked again to  complete creation  */
       element.removeAttribute("id");
       snapElementToGrid(element, gridBoxSize);
       createDragAnchorElement(element);
       element = null;
       canvas.style.cursor = "default";
-      console.log("finsihed.");
+      console.log("div container creation finsihed.");
     } else {
+      /* Creating div container on first click on anywhere in canvas */
+      console.log("div container creation begun.");
       currentContainerId = Math.random();
-      console.log("begun.");
       mouse.startX = mouse.x;
       mouse.startY = mouse.y;
       element = document.createElement("div");
       element.className = "rectangle";
       element.id = currentContainerId;
-      element.style.left = mouse.x + "px"; // TODO: use translateX and Y instead
-      element.style.top = mouse.y + "px";
       element.style.position = "absolute";
+      element.style.left = mouse.x + "px";
+      element.style.top = mouse.y + "px";
       canvas.appendChild(element);
     }
   }
 
-  function destroyContainer() {
+  function destroyContainer(currentContainerId) {
     document.getElementById(currentContainerId).remove();
     element = null;
+  }
+
+  function initTextNodeCreation(container) {
+    console.log("creating text node", container);
+    const paragraph = document.createElement("p");
+    paragraph.className = "paragraph";
+    paragraph.contentEditable = true;
+    container.target.appendChild(paragraph);
+    paragraph.focus();
   }
 
   canvas.onmousemove = function(e) {
@@ -143,20 +161,31 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
-  canvas.onclick = () => {
+  canvas.onclick = e => {
+    /* Distinguish single click or double click */
     clicks++;
     if (clicks === 1) {
+      // always run single click's handler so there is no delay in div
+      // creation if it was actually a single click
+      firstTarget = e;
       createContainer();
       firstClickTimeout = setTimeout(() => {
+        /* if this runs then for sure it was single click */
         clicks = 0;
+        // changes to crosshair cursor signifies cont creation
         if (element) {
           canvas.style.cursor = "crosshair";
         }
       }, 300);
     } else {
-      clearTimeout(firstClickTimeout);
+      /* it was a double click */
       console.log("double click");
-      destroyContainer();
+      clearTimeout(firstClickTimeout);
+      // destroys the div cont created in the always-run single click's handler
+      // so that when after a double click, that div cont won't be around
+      destroyContainer(currentContainerId);
+      // double click in a cont means creating texts
+      initTextNodeCreation(firstTarget);
       clicks = 0;
     }
   };
