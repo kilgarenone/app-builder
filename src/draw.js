@@ -1,4 +1,7 @@
-function snapToGridLine(val, gridBoxSize, { force }) {
+const CEIL = "ceil";
+const ROUND = "round";
+
+function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
   const snapCandidate = gridBoxSize * Math.round(val / gridBoxSize);
   if (force) {
     return snapCandidate;
@@ -10,15 +13,34 @@ function snapToGridLine(val, gridBoxSize, { force }) {
   }
 }
 
-function roundPixelToGridBoxes(pixel, gridBoxSize) {
-  return Math.round(parseFloat(pixel) / gridBoxSize);
+function roundPixelToGridBoxes(pixel, gridBoxSize, snapBehaviour = ROUND) {
+  return Math[snapBehaviour](parseFloat(pixel) / gridBoxSize);
 }
 
-function snapElementToGrid(element, gridBoxSize) {
-  const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
-  const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
-  const width = roundPixelToGridBoxes(element.style.width, gridBoxSize);
-  const height = roundPixelToGridBoxes(element.style.height, gridBoxSize);
+function snapElementToGrid(
+  element,
+  gridBoxSize,
+  { snapBehaviour } = { snapBehaviour: ROUND }
+) {
+  const top = roundPixelToGridBoxes(
+    element.style.top,
+    gridBoxSize,
+    snapBehaviour
+  );
+  const left = roundPixelToGridBoxes(
+    element.style.left,
+    gridBoxSize,
+    snapBehaviour
+  );
+  const width = roundPixelToGridBoxes(
+    element.style.width || element.clientWidth,
+    gridBoxSize,
+    snapBehaviour
+  );
+  const height = roundPixelToGridBoxes(
+    element.style.height || element.clientHeight,
+    gridBoxSize
+  );
 
   const gridColumnStart = left + 1;
   const gridColumnEnd = left + width + 1;
@@ -83,7 +105,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   let clicks = 0;
   let firstClickTimeout;
-  let firstTarget;
+  let firstClickedElement;
   let currentContainerId;
   let isDragAnchorClicked = false;
   let element = null;
@@ -134,6 +156,7 @@ export function initDraw(canvas, gridBoxSize) {
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
     console.log(x, y);
     const container = document.createElement("div");
+    container.className = "rectangle";
     container.style.position = "absolute";
     container.style.left = x + "px";
     container.style.top = y + "px";
@@ -143,6 +166,15 @@ export function initDraw(canvas, gridBoxSize) {
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
+    paragraph.onblur = completeTextNodeCreation;
+  }
+
+  function completeTextNodeCreation(e) {
+    console.log("pppp", e);
+    snapElementToGrid(e.target.parentNode, gridBoxSize, {
+      snapBehaviour: CEIL
+    });
+    e.target.removeAttribute("contentEditable");
   }
 
   function destroyContainer(currentContainerId) {
@@ -185,7 +217,7 @@ export function initDraw(canvas, gridBoxSize) {
     if (clicks === 1) {
       // always run single click's handler so there is no delay in div
       // creation if it was actually a single click
-      firstTarget = e;
+      firstClickedElement = e;
       createContainer();
       firstClickTimeout = setTimeout(() => {
         /* if this runs then for sure it was single click */
@@ -202,11 +234,20 @@ export function initDraw(canvas, gridBoxSize) {
       // destroys the div cont created in the always-run single click's handler
       // so that when after a double click, that div cont won't be around
       destroyContainer(currentContainerId);
-      // double click in a cont means creating texts
-      initTextNodeCreation(firstTarget);
+      // double click in a cont means creating or editing texts
+      if (firstClickedElement.target.className === "paragraph") {
+        editParagraph(firstClickedElement);
+      } else {
+        initTextNodeCreation(firstClickedElement);
+      }
       clicks = 0;
     }
   };
+
+  function editParagraph(e) {
+    console.log("eererer", e);
+    e.contentEditable = true;
+  }
 
   canvas.onmousedown = function(e) {
     if (e.target.className === "drag-anchor") {
