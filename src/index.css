@@ -1,6 +1,5 @@
 .rectangle {
   border: 1px solid #ff0000;
-  display: inline-block;
 }
 
 .paragraph:hover {
