@@ -1,5 +1,8 @@
-function snapToGridLine(val, gridBoxSize) {
+function snapToGridLine(val, gridBoxSize, { force }) {
   const snapCandidate = gridBoxSize * Math.round(val / gridBoxSize);
+  if (force) {
+    return snapCandidate;
+  }
   if (Math.abs(val - snapCandidate) < 10) {
     return snapCandidate;
   } else {
@@ -64,6 +67,11 @@ function normalizeTransformToGrid(element, gridBoxSize) {
   element.style.transform = "";
 }
 
+// function snapTextNodeContainerToGrid(element, gridBoxSize) {
+//   const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
+//   const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
+// }
+
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   const mouse = {
@@ -118,18 +126,28 @@ export function initDraw(canvas, gridBoxSize) {
     }
   }
 
-  function destroyContainer(currentContainerId) {
-    document.getElementById(currentContainerId).remove();
-    element = null;
-  }
-
-  function initTextNodeCreation(container) {
-    console.log("creating text node", container);
+  function initTextNodeCreation(e) {
+    console.log("creating text node", e);
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
+    const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
+    const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
+    console.log(x, y);
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.left = x + "px";
+    container.style.top = y + "px";
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
     paragraph.contentEditable = true;
-    container.target.appendChild(paragraph);
+    container.appendChild(paragraph);
+    e.target.appendChild(container);
     paragraph.focus();
+  }
+
+  function destroyContainer(currentContainerId) {
+    document.getElementById(currentContainerId).remove();
+    element = null;
   }
 
   canvas.onmousemove = function(e) {

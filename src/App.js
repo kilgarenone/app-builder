@@ -33,6 +33,7 @@ class App extends Component {
             left: 0,
             width: "100%",
             height: "100vh",
+            pointerEvents: "none",
             backgroundSize: `${this.state.gridBoxSize}px ${
               this.state.gridBoxSize
             }px`,
