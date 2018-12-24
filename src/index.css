@@ -1,9 +1,10 @@
 .rectangle {
   border: 1px solid #ff0000;
-  height: auto;
+  display: inline-block;
 }
 
-.paragraph {
+.paragraph:hover {
+  cursor: text;
   /* min-height: auto; */
 }
 

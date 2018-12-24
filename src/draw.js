@@ -107,6 +107,7 @@ export function initDraw(canvas, gridBoxSize) {
   let firstClickTimeout;
   let firstClickedElement;
   let currentContainerId;
+  let isEditingParagraph = false;
   let isDragAnchorClicked = false;
   let element = null;
 
@@ -149,12 +150,11 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function initTextNodeCreation(e) {
-    console.log("creating text node", e);
+    console.log("creating text node");
     mouse.startX = mouse.x;
     mouse.startY = mouse.y;
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
-    console.log(x, y);
     const container = document.createElement("div");
     container.className = "rectangle";
     container.style.position = "absolute";
@@ -171,10 +171,14 @@ export function initDraw(canvas, gridBoxSize) {
 
   function completeTextNodeCreation(e) {
     console.log("pppp", e);
+    if (isEditingParagraph) {
+      isEditingParagraph = false;
+      return;
+    }
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
-    e.target.removeAttribute("contentEditable");
+    // e.target.removeAttribute("contentEditable");
   }
 
   function destroyContainer(currentContainerId) {
@@ -213,6 +217,11 @@ export function initDraw(canvas, gridBoxSize) {
 
   canvas.onclick = e => {
     /* Distinguish single click or double click */
+    if (e.target.className === "paragraph") {
+      isEditingParagraph = true;
+      // editParagraph(firstClickedElement);
+      return;
+    }
     clicks++;
     if (clicks === 1) {
       // always run single click's handler so there is no delay in div
@@ -234,19 +243,17 @@ export function initDraw(canvas, gridBoxSize) {
       // destroys the div cont created in the always-run single click's handler
       // so that when after a double click, that div cont won't be around
       destroyContainer(currentContainerId);
-      // double click in a cont means creating or editing texts
-      if (firstClickedElement.target.className === "paragraph") {
-        editParagraph(firstClickedElement);
-      } else {
-        initTextNodeCreation(firstClickedElement);
-      }
+      // double click in a cont means creating texts
+      initTextNodeCreation(firstClickedElement);
       clicks = 0;
     }
   };
 
   function editParagraph(e) {
     console.log("eererer", e);
-    e.contentEditable = true;
+    e.target.focus();
+    // const el = e.target;
+    // el.contentEditable = true;
   }
 
   canvas.onmousedown = function(e) {
