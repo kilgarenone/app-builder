@@ -6,7 +6,7 @@ function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
   if (force) {
     return snapCandidate;
   }
-  if (Math.abs(val - snapCandidate) < 10) {
+  if (Math.abs(val - snapCandidate) <= 10) {
     return snapCandidate;
   } else {
     return val;
@@ -262,15 +262,18 @@ export function initDraw(canvas, gridBoxSize) {
   };
 
   canvas.onmousedown = function(e) {
-    if (e.target.className === "drag-anchor") {
+    const target = e.target;
+    if (target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
       mouse.startX = mouse.x;
       mouse.startY = mouse.y;
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
-      e.target.onclick = e => e.stopPropagation();
-      element = e.target.parentNode;
+      target.onclick = e => e.stopPropagation();
+      element = target.parentNode;
+    } else if (target.id === "startPoint") {
+      createContainer();
     }
   };
 }
