@@ -22,20 +22,11 @@ function snapElementToGrid(
   gridBoxSize,
   { snapBehaviour } = { snapBehaviour: ROUND }
 ) {
-  const top = roundPixelToGridBoxes(
-    element.style.top,
-    gridBoxSize,
-    snapBehaviour
-  );
-  const left = roundPixelToGridBoxes(
-    element.style.left,
-    gridBoxSize,
-    snapBehaviour
-  );
+  const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
+  const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
   const width = roundPixelToGridBoxes(
     element.style.width || element.clientWidth,
-    gridBoxSize,
-    snapBehaviour
+    gridBoxSize
   );
   const height = roundPixelToGridBoxes(
     element.style.height || element.clientHeight,
@@ -107,7 +98,7 @@ export function initDraw(canvas, gridBoxSize) {
   let firstClickTimeout;
   let firstClickedElement;
   let currentContainerId;
-  let isEditingParagraph = false;
+  let isEditingMode = false;
   let isDragAnchorClicked = false;
   let element = null;
 
@@ -151,6 +142,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   function initTextNodeCreation(e) {
     console.log("creating text node");
+    isEditingMode = true;
     mouse.startX = mouse.x;
     mouse.startY = mouse.y;
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
@@ -163,16 +155,16 @@ export function initDraw(canvas, gridBoxSize) {
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
     paragraph.contentEditable = true;
+    paragraph.oninput = () => console.log("texting!!!");
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
+    paragraph.style.visibility = "hidden";
     paragraph.onblur = completeTextNodeCreation;
   }
 
   function completeTextNodeCreation(e) {
-    console.log("pppp", e);
-    if (isEditingParagraph) {
-      isEditingParagraph = false;
+    if (isEditingMode) {
       return;
     }
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
@@ -215,46 +207,59 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
+  function positionStartPoint() {
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
+
+    const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
+    const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
+
+    const startPointEle = document.getElementById("startPoint");
+    startPointEle.style.transform = `translate(${x - 10}px, ${y - 10}px)`;
+    startPointEle.style.visibility = "visible";
+  }
+  /* Distinguish single click or double click */
   canvas.onclick = e => {
-    /* Distinguish single click or double click */
-    if (e.target.className === "paragraph") {
-      isEditingParagraph = true;
-      // editParagraph(firstClickedElement);
-      return;
-    }
+    // if (isEditingMode) {
+    //   isEditingMode = false;
+    //   console.log("hell");
+    //   return;
+    // }
+
     clicks++;
     if (clicks === 1) {
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
       // always run single click's handler so there is no delay in div
       // creation if it was actually a single click
       firstClickedElement = e;
-      createContainer();
-      firstClickTimeout = setTimeout(() => {
-        /* if this runs then for sure it was single click */
-        clicks = 0;
-        // changes to crosshair cursor signifies cont creation
-        if (element) {
-          canvas.style.cursor = "crosshair";
-        }
-      }, 300);
+      /* if this runs then for sure it was single click */
+      firstClickTimeout = setTimeout(() => (clicks = 0), 300);
     } else {
       /* it was a double click */
       console.log("double click");
+      // isEditingMode = true;
+      positionStartPoint();
+      // createContainer();
+      // initTextNodeCreation(firstClickedElement);
+
+      // setTimeout(() => {
+      //   if (
+      //     Math.abs(mouse.x - mouse.startX) < 10 &&
+      //     Math.abs(mouse.x - mouse.startX) < 10
+      //   ) {
+      //     // destroys the div cont created in the always-run single click's handler
+      //     // so that when after a double click, that div cont won't be around
+      //     destroyContainer(currentContainerId);
+      //   } else {
+      //     // changes to crosshair cursor signifies cont creation
+      //     canvas.style.cursor = "crosshair";
+      //   }
+      // }, 500);
       clearTimeout(firstClickTimeout);
-      // destroys the div cont created in the always-run single click's handler
-      // so that when after a double click, that div cont won't be around
-      destroyContainer(currentContainerId);
-      // double click in a cont means creating texts
-      initTextNodeCreation(firstClickedElement);
       clicks = 0;
     }
   };
-
-  function editParagraph(e) {
-    console.log("eererer", e);
-    e.target.focus();
-    // const el = e.target;
-    // el.contentEditable = true;
-  }
 
   canvas.onmousedown = function(e) {
     if (e.target.className === "drag-anchor") {

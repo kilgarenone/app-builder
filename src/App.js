@@ -41,6 +41,7 @@ class App extends Component {
               "radial-gradient(circle at left top, #000000 1px, rgba(0, 0, 0, 0) 1px)"
           }}
         />
+        <div id="startPoint" />
         {/* <div style={{display: 'grid', gridTemplateColumns: }} */}
       </div>
     );
