@@ -42,7 +42,6 @@ class App extends Component {
           }}
         />
         <div id="startPoint" />
-        {/* <div style={{display: 'grid', gridTemplateColumns: }} */}
       </div>
     );
   }
