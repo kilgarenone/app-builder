@@ -3,9 +3,11 @@ const ROUND = "round";
 
 function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
   const snapCandidate = gridBoxSize * Math.round(val / gridBoxSize);
+
   if (force) {
     return snapCandidate;
   }
+
   if (Math.abs(val - snapCandidate) < 10) {
     return snapCandidate;
   } else {
@@ -81,11 +83,6 @@ function normalizeTransformToGrid(element, gridBoxSize) {
   element = null;
 }
 
-// function snapTextNodeContainerToGrid(element, gridBoxSize) {
-//   const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
-//   const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
-// }
-
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   const mouse = {
@@ -159,13 +156,15 @@ export function initDraw(canvas, gridBoxSize) {
     mouse.startY = mouse.y;
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
+
     const container = document.createElement("div");
     currentContainerId = Math.random();
     container.id = currentContainerId;
     container.className = "rectangle";
     container.style.position = "absolute";
-    container.style.left = x + "px";
-    container.style.top = y + "px";
+    container.style.left = `${x}px`;
+    container.style.top = `${y}px`;
+
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
     paragraph.contentEditable = true;
@@ -176,6 +175,10 @@ export function initDraw(canvas, gridBoxSize) {
       paragraph.oninput = null;
     };
     paragraph.onblur = completeTextNodeCreation;
+    paragraph.onclick = e => {
+      console.log("e", e.target.style);
+      // setTimeout(() => (e.target.style.userSelect = "auto"), 0);
+    };
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
@@ -193,10 +196,9 @@ export function initDraw(canvas, gridBoxSize) {
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
-    // e.target.removeAttribute("contentEditable");
   }
 
-  canvas.onmousemove = function(e) {
+  canvas.onmousemove = e => {
     setMousePosition(e);
 
     if (isDragAnchorClicked) {
@@ -225,7 +227,7 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
-  canvas.onmouseup = function() {
+  canvas.onmouseup = () => {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
       canvas.style.cursor = "default";
@@ -259,6 +261,7 @@ export function initDraw(canvas, gridBoxSize) {
     startPointEle.style.transform = `translate(${x - 10}px, ${y - 10}px)`;
     startPointEle.style.opacity = 1;
   }
+
   /* Distinguish single click or double click */
   canvas.onclick = e => {
     // if (isEditingMode) {
@@ -266,7 +269,6 @@ export function initDraw(canvas, gridBoxSize) {
     //   console.log("hell");
     //   return;
     // }
-    console.log("eee", firstClickedElement);
     clicks++;
     if (clicks === 1) {
       firstClickedElement = e;
