@@ -105,6 +105,16 @@ export function initDraw(canvas, gridBoxSize) {
   let element = null;
   const startPointEle = document.getElementById("startPoint");
 
+  function destroyContainer(currentContainerId) {
+    if (currentContainerId) {
+      const container = document.getElementById(currentContainerId);
+      if (container) {
+        container.remove();
+      }
+    }
+    element = null;
+  }
+
   function setMousePosition(e) {
     const ev = e || window.event; //Moz || IE
     if (ev.pageX) {
@@ -145,12 +155,13 @@ export function initDraw(canvas, gridBoxSize) {
 
   function initTextNodeCreation(e) {
     console.log("creating text node");
-    isEditingMode = true;
     mouse.startX = mouse.x;
     mouse.startY = mouse.y;
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
     const container = document.createElement("div");
+    currentContainerId = Math.random();
+    container.id = currentContainerId;
     container.className = "rectangle";
     container.style.position = "absolute";
     container.style.left = x + "px";
@@ -158,31 +169,31 @@ export function initDraw(canvas, gridBoxSize) {
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
     paragraph.contentEditable = true;
+    paragraph.style.transform = "scale(0, 0)";
     paragraph.oninput = () => {
       paragraph.style.transform = "scale(1, 1)";
-      console.log("texting!!!");
+      startPointEle.style.opacity = 0;
+      paragraph.oninput = null;
     };
+    paragraph.onblur = completeTextNodeCreation;
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
-    paragraph.style.opacity = 0;
-    paragraph.style.transform = "scale(0, 0)";
-    paragraph.onblur = completeTextNodeCreation;
   }
 
   function completeTextNodeCreation(e) {
-    if (isEditingMode) {
+    console.log(e);
+    if (!e.target.innerText) {
+      // refocus previous paragraph if user single clicks elsewhere
+      // while the startpoint is active
+      setTimeout(() => e.target.focus(), 0);
       return;
     }
+    e.target.parentNode.removeAttribute("id");
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
     // e.target.removeAttribute("contentEditable");
-  }
-
-  function destroyContainer(currentContainerId) {
-    document.getElementById(currentContainerId).remove();
-    element = null;
   }
 
   canvas.onmousemove = function(e) {
@@ -223,10 +234,10 @@ export function initDraw(canvas, gridBoxSize) {
       isCreatingContainer = false;
 
       // if mouse meant to create cont hasn't moved since clicked
-      // on start point, then remove the const
+      // on start point, then remove the cont
       if (
-        Math.abs(mouse.x - mouse.startX) < 5 &&
-        Math.abs(mouse.y - mouse.startY) < 5
+        Math.abs(mouse.x - mouse.startX) < 10 &&
+        Math.abs(mouse.y - mouse.startY) < 10
       ) {
         destroyContainer(currentContainerId);
         return;
@@ -239,6 +250,8 @@ export function initDraw(canvas, gridBoxSize) {
   function positionStartPoint() {
     mouse.startX = mouse.x;
     mouse.startY = mouse.y;
+
+    destroyContainer(currentContainerId);
 
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
@@ -253,7 +266,7 @@ export function initDraw(canvas, gridBoxSize) {
     //   console.log("hell");
     //   return;
     // }
-
+    console.log("eee", firstClickedElement);
     clicks++;
     if (clicks === 1) {
       firstClickedElement = e;
@@ -270,18 +283,20 @@ export function initDraw(canvas, gridBoxSize) {
   };
 
   canvas.onmousedown = function(e) {
-    const target = e.target;
-    if (target.className === "drag-anchor") {
+    if (e.target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
       mouse.startX = mouse.x;
       mouse.startY = mouse.y;
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
-      target.onclick = e => e.stopPropagation();
-      element = target.parentNode;
-    } else if (target.id === "startPoint") {
+      e.target.onclick = e => e.stopPropagation();
+      element = e.target.parentNode;
+    } else if (e.target.id === "startPoint") {
       isCreatingContainer = true;
+      // this is the container of paragraph. removes it since user opt
+      // for container creation
+      destroyContainer(currentContainerId);
       createContainer();
     }
   };

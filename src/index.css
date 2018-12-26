@@ -18,6 +18,7 @@
   height: 20px;
   border-radius: 50%;
   background-color: blueviolet;
+  transition: opacity 0.3s;
 }
 
 #startPoint:before {
