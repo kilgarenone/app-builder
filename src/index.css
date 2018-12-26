@@ -13,7 +13,7 @@
 
 #startPoint {
   position: absolute;
-  visibility: hidden;
+  opacity: 0;
   width: 20px;
   height: 20px;
   border-radius: 50%;

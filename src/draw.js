@@ -97,6 +97,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   let clicks = 0;
   let firstClickTimeout;
+  let firstClickedElement;
   let isCreatingContainer = false;
   let currentContainerId;
   let isEditingMode = false;
@@ -157,11 +158,15 @@ export function initDraw(canvas, gridBoxSize) {
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
     paragraph.contentEditable = true;
-    paragraph.oninput = () => console.log("texting!!!");
+    paragraph.oninput = () => {
+      paragraph.style.transform = "scale(1, 1)";
+      console.log("texting!!!");
+    };
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
-    paragraph.style.visibility = "hidden";
+    paragraph.style.opacity = 0;
+    paragraph.style.transform = "scale(0, 0)";
     paragraph.onblur = completeTextNodeCreation;
   }
 
@@ -189,7 +194,7 @@ export function initDraw(canvas, gridBoxSize) {
       canvas.style.cursor = "move";
       element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (isCreatingContainer) {
-      startPointEle.style.visibility = "hidden";
+      startPointEle.style.opacity = 0;
       canvas.style.cursor = "crosshair";
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
@@ -239,7 +244,7 @@ export function initDraw(canvas, gridBoxSize) {
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
 
     startPointEle.style.transform = `translate(${x - 10}px, ${y - 10}px)`;
-    startPointEle.style.visibility = "visible";
+    startPointEle.style.opacity = 1;
   }
   /* Distinguish single click or double click */
   canvas.onclick = e => {
@@ -251,13 +256,14 @@ export function initDraw(canvas, gridBoxSize) {
 
     clicks++;
     if (clicks === 1) {
+      firstClickedElement = e;
       /* if this runs then for sure it was single click */
       firstClickTimeout = setTimeout(() => (clicks = 0), 250);
     } else {
       /* it was a double click */
       console.log("double click");
       positionStartPoint();
-      // initTextNodeCreation(firstClickedElement);
+      initTextNodeCreation(firstClickedElement);
       clearTimeout(firstClickTimeout);
       clicks = 0;
     }
