@@ -78,6 +78,7 @@ function normalizeTransformToGrid(element, gridBoxSize) {
   element.style.gridColumnEnd = +element.style.gridColumnEnd + offsetGridBoxesX;
 
   element.style.transform = "";
+  element = null;
 }
 
 // function snapTextNodeContainerToGrid(element, gridBoxSize) {
@@ -96,11 +97,12 @@ export function initDraw(canvas, gridBoxSize) {
 
   let clicks = 0;
   let firstClickTimeout;
-  let firstClickedElement;
+  let isCreatingContainer = false;
   let currentContainerId;
   let isEditingMode = false;
   let isDragAnchorClicked = false;
   let element = null;
+  const startPointEle = document.getElementById("startPoint");
 
   function setMousePosition(e) {
     const ev = e || window.event; //Moz || IE
@@ -115,29 +117,29 @@ export function initDraw(canvas, gridBoxSize) {
     }
   }
 
+  function completeContainerCreation(element, gridBoxSize) {
+    snapElementToGrid(element, gridBoxSize);
+    createDragAnchorElement(element);
+    canvas.style.cursor = "default";
+    element.removeAttribute("id");
+    element = null;
+    console.log("div container creation finsihed.");
+  }
+
+  /* Creating div container on first click on anywhere in canvas */
   function createContainer() {
-    if (element !== null) {
-      /* Clean up the container when clicked again to  complete creation  */
-      element.removeAttribute("id");
-      snapElementToGrid(element, gridBoxSize);
-      createDragAnchorElement(element);
-      element = null;
-      canvas.style.cursor = "default";
-      console.log("div container creation finsihed.");
-    } else {
-      /* Creating div container on first click on anywhere in canvas */
-      console.log("div container creation begun.");
-      currentContainerId = Math.random();
-      mouse.startX = mouse.x;
-      mouse.startY = mouse.y;
-      element = document.createElement("div");
-      element.className = "rectangle";
-      element.id = currentContainerId;
-      element.style.position = "absolute";
-      element.style.left = mouse.x + "px";
-      element.style.top = mouse.y + "px";
-      canvas.appendChild(element);
-    }
+    console.log("div container creation begun.");
+    isCreatingContainer = true;
+    currentContainerId = Math.random();
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
+    element = document.createElement("div");
+    element.className = "rectangle";
+    element.id = currentContainerId;
+    element.style.position = "absolute";
+    element.style.left = mouse.x + "px";
+    element.style.top = mouse.y + "px";
+    canvas.appendChild(element);
   }
 
   function initTextNodeCreation(e) {
@@ -184,9 +186,11 @@ export function initDraw(canvas, gridBoxSize) {
     if (isDragAnchorClicked) {
       const x = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
       const y = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
-
+      canvas.style.cursor = "move";
       element.style.transform = `translate(${x}px, ${y}px)`;
-    } else if (element !== null) {
+    } else if (isCreatingContainer) {
+      startPointEle.style.visibility = "hidden";
+      canvas.style.cursor = "crosshair";
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
       const snappedStartX = snapToGridLine(mouse.startX, gridBoxSize, {
@@ -208,8 +212,22 @@ export function initDraw(canvas, gridBoxSize) {
   canvas.onmouseup = function() {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
+      canvas.style.cursor = "default";
       normalizeTransformToGrid(element, gridBoxSize);
-      element = null;
+    } else if (isCreatingContainer) {
+      isCreatingContainer = false;
+
+      // if mouse meant to create cont hasn't moved since clicked
+      // on start point, then remove the const
+      if (
+        Math.abs(mouse.x - mouse.startX) < 5 &&
+        Math.abs(mouse.y - mouse.startY) < 5
+      ) {
+        destroyContainer(currentContainerId);
+        return;
+      }
+
+      completeContainerCreation(element, gridBoxSize);
     }
   };
 
@@ -220,7 +238,6 @@ export function initDraw(canvas, gridBoxSize) {
     const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
 
-    const startPointEle = document.getElementById("startPoint");
     startPointEle.style.transform = `translate(${x - 10}px, ${y - 10}px)`;
     startPointEle.style.visibility = "visible";
   }
@@ -234,34 +251,13 @@ export function initDraw(canvas, gridBoxSize) {
 
     clicks++;
     if (clicks === 1) {
-      mouse.startX = mouse.x;
-      mouse.startY = mouse.y;
-      // always run single click's handler so there is no delay in div
-      // creation if it was actually a single click
-      firstClickedElement = e;
       /* if this runs then for sure it was single click */
-      firstClickTimeout = setTimeout(() => (clicks = 0), 300);
+      firstClickTimeout = setTimeout(() => (clicks = 0), 250);
     } else {
       /* it was a double click */
       console.log("double click");
-      // isEditingMode = true;
       positionStartPoint();
-      // createContainer();
       // initTextNodeCreation(firstClickedElement);
-
-      // setTimeout(() => {
-      //   if (
-      //     Math.abs(mouse.x - mouse.startX) < 10 &&
-      //     Math.abs(mouse.x - mouse.startX) < 10
-      //   ) {
-      //     // destroys the div cont created in the always-run single click's handler
-      //     // so that when after a double click, that div cont won't be around
-      //     destroyContainer(currentContainerId);
-      //   } else {
-      //     // changes to crosshair cursor signifies cont creation
-      //     canvas.style.cursor = "crosshair";
-      //   }
-      // }, 500);
       clearTimeout(firstClickTimeout);
       clicks = 0;
     }
@@ -279,6 +275,7 @@ export function initDraw(canvas, gridBoxSize) {
       target.onclick = e => e.stopPropagation();
       element = target.parentNode;
     } else if (target.id === "startPoint") {
+      isCreatingContainer = true;
       createContainer();
     }
   };
