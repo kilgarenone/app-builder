@@ -92,12 +92,9 @@ export function initDraw(canvas, gridBoxSize) {
     startY: 0
   };
 
-  let clicks = 0;
-  let firstClickTimeout;
   let firstClickedElement;
   let isCreatingContainer = false;
   let currentContainerId;
-  let isEditingMode = false;
   let isDragAnchorClicked = false;
   let element = null;
   const startPointEle = document.getElementById("startPoint");
@@ -264,23 +261,23 @@ export function initDraw(canvas, gridBoxSize) {
 
   /* Distinguish single click or double click */
   canvas.onclick = e => {
+    console.log(e.detail);
     // if (isEditingMode) {
     //   isEditingMode = false;
     //   console.log("hell");
     //   return;
     // }
-    clicks++;
-    if (clicks === 1) {
+    if (e.detail === 1) {
       firstClickedElement = e;
       /* if this runs then for sure it was single click */
-      firstClickTimeout = setTimeout(() => (clicks = 0), 250);
-    } else {
+      // firstClickTimeout = setTimeout(() => (clicks = 0), 250);
+    } else if (e.detail === 2) {
       /* it was a double click */
       console.log("double click");
       positionStartPoint();
       initTextNodeCreation(firstClickedElement);
-      clearTimeout(firstClickTimeout);
-      clicks = 0;
+      // clearTimeout(firstClickTimeout);
+      // clicks = 0;
     }
   };
 
