@@ -261,7 +261,6 @@ export function initDraw(canvas, gridBoxSize) {
 
   /* Distinguish single click or double click */
   canvas.onclick = e => {
-    console.log(e.detail);
     // if (isEditingMode) {
     //   isEditingMode = false;
     //   console.log("hell");
