@@ -189,6 +189,7 @@ export function initDraw(canvas, gridBoxSize) {
       setTimeout(() => e.target.focus(), 0);
       return;
     }
+    e.target.setAttribute("spellcheck", false);
     e.target.parentNode.removeAttribute("id");
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
