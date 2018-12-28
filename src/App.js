@@ -8,7 +8,7 @@ class App extends Component {
     super(props);
     this.state = { gridBoxSize: 0 };
     this.canvas = React.createRef();
-    this.numberOfGridLines = 80;
+    this.numberOfGridLines = 40;
   }
   componentDidMount() {
     const gridBoxSize = Math.round(window.innerWidth / this.numberOfGridLines);

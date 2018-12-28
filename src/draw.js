@@ -90,7 +90,6 @@ export function initDraw(canvas, gridBoxSize) {
     startY: 0
   };
 
-  let firstClickedElement;
   let isCreatingContainer = false;
   let currentContainerId;
   let currentParagraphId;
@@ -151,6 +150,8 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function initTextNodeCreation(e) {
+    // TODO: Create granular gridboxes when user is
+    // creating a rectangle inside another rectangle!
     console.log("creating text node");
     destroyContainer(currentParagraphId);
     const container = document.createElement("div");
@@ -255,10 +256,7 @@ export function initDraw(canvas, gridBoxSize) {
   /* Distinguish single click or double click */
   canvas.onclick = e => {
     console.log(e);
-    if (e.detail === 1) {
-      // it was a single click
-      firstClickedElement = e;
-    } else if (e.detail === 2) {
+    if (e.detail === 2) {
       /* it was a double click */
       console.log("double click");
       setMousePosition(e);
