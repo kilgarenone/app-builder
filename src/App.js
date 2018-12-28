@@ -10,7 +10,7 @@ class App extends Component {
     this.canvas = React.createRef();
   }
   componentDidMount() {
-    const gridBoxSize = window.innerWidth / 40;
+    const gridBoxSize = Math.round(window.innerWidth / 40);
     this.setState({ gridBoxSize });
     initDraw(this.canvas.current, gridBoxSize);
   }
