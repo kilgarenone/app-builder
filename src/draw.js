@@ -63,7 +63,9 @@ function getOffsetXandY(element) {
 }
 
 function normalizeTransformToGrid(element, gridBoxSize) {
+  console.log(element.style.transform);
   const offset = getOffsetXandY(element);
+  console.log(offset);
   // might mean double clicked the drag square box without mousemove,
   // therefore, no transform data is set. if yes, don't access offset
   // array, otherwise error will be thrown
@@ -86,8 +88,6 @@ function normalizeTransformToGrid(element, gridBoxSize) {
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   const mouse = {
-    x: 0,
-    y: 0,
     startX: 0,
     startY: 0
   };
@@ -102,9 +102,7 @@ export function initDraw(canvas, gridBoxSize) {
   let snappedX = 0;
   let snappedY = 0;
 
-  function calcSnappedToXY() {
-    mouse.startX = mouse.x;
-    mouse.startY = mouse.y;
+  function calcSnappedToXY(e) {
     snappedX = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
     snappedY = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
   }
@@ -120,16 +118,8 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function setMousePosition(e) {
-    const ev = e || window.event; //Moz || IE
-    if (ev.pageX) {
-      //Moz
-      mouse.x = ev.pageX + window.pageXOffset;
-      mouse.y = ev.pageY + window.pageYOffset;
-    } else if (ev.clientX) {
-      //IE
-      mouse.x = ev.clientX + document.body.scrollLeft;
-      mouse.y = ev.clientY + document.body.scrollTop;
-    }
+    mouse.startX = e.pageX + window.pageXOffset;
+    mouse.startY = e.pageY + window.pageYOffset;
   }
 
   function completeContainerCreation(element, gridBoxSize) {
@@ -143,7 +133,7 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   /* Creating div container on first click on anywhere in canvas */
-  function createContainer() {
+  function createContainer(e) {
     console.log("div container creation begun.");
     destroyContainer(currentContainerId);
     currentContainerId = Math.random();
@@ -151,8 +141,8 @@ export function initDraw(canvas, gridBoxSize) {
     element.className = "rectangle";
     element.id = currentContainerId;
     element.style.position = "absolute";
-    element.style.left = mouse.x + "px";
-    element.style.top = mouse.y + "px";
+    element.style.left = e.pageX + "px";
+    element.style.top = e.pageY + "px";
     canvas.appendChild(element);
   }
 
@@ -199,19 +189,17 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   canvas.onmousemove = e => {
-    setMousePosition(e);
-
     if (isDragAnchorClicked) {
-      const x = snapToGridLine(mouse.x - mouse.startX, gridBoxSize);
-      const y = snapToGridLine(mouse.y - mouse.startY, gridBoxSize);
+      const x = snapToGridLine(e.pageX - mouse.startX, gridBoxSize);
+      const y = snapToGridLine(e.pageY - mouse.startY, gridBoxSize);
       canvas.style.cursor = "move";
       element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (isCreatingContainer) {
       // if cursor is still moving inside the start point region,
       // don't create the container yet
       if (
-        Math.abs(mouse.x - snappedX) <= 10 ||
-        Math.abs(mouse.y - snappedY) <= 10
+        Math.abs(e.pageX - snappedX) <= 10 ||
+        Math.abs(e.pageY - snappedY) <= 10
       ) {
         // destroyContainer(currentContainerId);
         return;
@@ -219,21 +207,21 @@ export function initDraw(canvas, gridBoxSize) {
 
       // if mouse meant to create cont hasn't moved since clicked
       // on start point, then remove the cont
-      const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
-      const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
+      const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
+      const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
 
       startPointEle.style.opacity = 0;
       canvas.style.cursor = "crosshair";
       element.style.width = `${Math.abs(snapToGridX - snappedX)}px`;
       element.style.height = `${Math.abs(snapToGridY - snappedY)}px`;
       element.style.left =
-        mouse.x - snappedX < 0 ? `${snapToGridX}px` : `${snappedX}px`;
+        e.pageX - snappedX < 0 ? `${snapToGridX}px` : `${snappedX}px`;
       element.style.top =
-        mouse.y - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
+        e.pageY - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
     }
   };
 
-  canvas.onmouseup = () => {
+  canvas.onmouseup = e => {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
       canvas.style.cursor = "default";
@@ -243,8 +231,8 @@ export function initDraw(canvas, gridBoxSize) {
       // don't create the container yet
       isCreatingContainer = false;
       if (
-        Math.abs(mouse.x - snappedX) <= 10 ||
-        Math.abs(mouse.y - snappedY) <= 10
+        Math.abs(e.pageX - snappedX) <= 10 ||
+        Math.abs(e.pageY - snappedY) <= 10
       ) {
         // destroyContainer(currentContainerId);
         return;
@@ -262,31 +250,33 @@ export function initDraw(canvas, gridBoxSize) {
 
   /* Distinguish single click or double click */
   canvas.onclick = e => {
+    console.log(e);
     if (e.detail === 1) {
       // it was a single click
       firstClickedElement = e;
     } else if (e.detail === 2) {
       /* it was a double click */
       console.log("double click");
-      calcSnappedToXY();
+      setMousePosition(e);
+      calcSnappedToXY(e);
       positionStartPoint();
       initTextNodeCreation(firstClickedElement);
     }
   };
 
-  canvas.onmousedown = function(e) {
+  canvas.onmousedown = e => {
     if (e.target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
-      mouse.startX = mouse.x;
-      mouse.startY = mouse.y;
+      mouse.startX = e.pageX;
+      mouse.startY = e.pageY;
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
       e.target.onclick = e => e.stopPropagation();
       element = e.target.parentNode;
     } else if (e.target.id === "startPoint") {
       isCreatingContainer = true;
-      createContainer();
+      createContainer(e);
     } else if (e.target.className === "paragraph") {
       e.target.setAttribute("spellcheck", true);
     }
