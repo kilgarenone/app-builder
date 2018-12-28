@@ -8,9 +8,10 @@ class App extends Component {
     super(props);
     this.state = { gridBoxSize: 0 };
     this.canvas = React.createRef();
+    this.numberOfGridLines = 80;
   }
   componentDidMount() {
-    const gridBoxSize = Math.round(window.innerWidth / 40);
+    const gridBoxSize = Math.round(window.innerWidth / this.numberOfGridLines);
     this.setState({ gridBoxSize });
     initDraw(this.canvas.current, gridBoxSize);
   }
@@ -21,9 +22,9 @@ class App extends Component {
         style={{
           display: "grid",
           maxHeight: "100vh",
-          gridTemplate: `repeat(40, ${this.state.gridBoxSize}px) / repeat(40, ${
+          gridTemplate: `repeat(${this.numberOfGridLines}, ${
             this.state.gridBoxSize
-          }px)`
+          }px) / repeat(${this.numberOfGridLines}, ${this.state.gridBoxSize}px)`
         }}
         ref={this.canvas}
       >

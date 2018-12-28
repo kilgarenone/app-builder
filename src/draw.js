@@ -264,7 +264,7 @@ export function initDraw(canvas, gridBoxSize) {
       setMousePosition(e);
       calcSnappedToXY(e);
       positionStartPoint();
-      initTextNodeCreation(firstClickedElement);
+      initTextNodeCreation(e);
     }
   };
 
