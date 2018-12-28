@@ -8,7 +8,7 @@ function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
     return snapCandidate;
   }
 
-  if (Math.abs(val - snapCandidate) < 10) {
+  if (Math.abs(val - snapCandidate) <= 10) {
     return snapCandidate;
   } else {
     return val;
@@ -95,9 +95,19 @@ export function initDraw(canvas, gridBoxSize) {
   let firstClickedElement;
   let isCreatingContainer = false;
   let currentContainerId;
+  let currentParagraphId;
   let isDragAnchorClicked = false;
   let element = null;
   const startPointEle = document.getElementById("startPoint");
+  let snappedX = 0;
+  let snappedY = 0;
+
+  function calcSnappedToXY() {
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
+    snappedX = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
+    snappedY = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
+  }
 
   function destroyContainer(currentContainerId) {
     if (currentContainerId) {
@@ -125,6 +135,7 @@ export function initDraw(canvas, gridBoxSize) {
   function completeContainerCreation(element, gridBoxSize) {
     snapElementToGrid(element, gridBoxSize);
     createDragAnchorElement(element);
+    destroyContainer(currentParagraphId);
     canvas.style.cursor = "default";
     element.removeAttribute("id");
     element = null;
@@ -134,10 +145,8 @@ export function initDraw(canvas, gridBoxSize) {
   /* Creating div container on first click on anywhere in canvas */
   function createContainer() {
     console.log("div container creation begun.");
-    isCreatingContainer = true;
+    destroyContainer(currentContainerId);
     currentContainerId = Math.random();
-    mouse.startX = mouse.x;
-    mouse.startY = mouse.y;
     element = document.createElement("div");
     element.className = "rectangle";
     element.id = currentContainerId;
@@ -149,18 +158,14 @@ export function initDraw(canvas, gridBoxSize) {
 
   function initTextNodeCreation(e) {
     console.log("creating text node");
-    mouse.startX = mouse.x;
-    mouse.startY = mouse.y;
-    const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
-    const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
-
+    destroyContainer(currentParagraphId);
     const container = document.createElement("div");
-    currentContainerId = Math.random();
-    container.id = currentContainerId;
+    currentParagraphId = Math.random();
+    container.id = currentParagraphId;
     container.className = "rectangle";
     container.style.position = "absolute";
-    container.style.left = `${x}px`;
-    container.style.top = `${y}px`;
+    container.style.left = `${snappedX}px`;
+    container.style.top = `${snappedY}px`;
 
     const paragraph = document.createElement("p");
     paragraph.className = "paragraph";
@@ -169,20 +174,16 @@ export function initDraw(canvas, gridBoxSize) {
     paragraph.oninput = () => {
       paragraph.style.transform = "scale(1, 1)";
       startPointEle.style.opacity = 0;
+      destroyContainer(currentContainerId);
       paragraph.oninput = null;
     };
     paragraph.onblur = completeTextNodeCreation;
-    paragraph.onclick = e => {
-      console.log("e", e.target.style);
-      // setTimeout(() => (e.target.style.userSelect = "auto"), 0);
-    };
     container.appendChild(paragraph);
     e.target.appendChild(container);
     paragraph.focus();
   }
 
   function completeTextNodeCreation(e) {
-    console.log(e);
     if (!e.target.innerText) {
       // refocus previous paragraph if user single clicks elsewhere
       // while the startpoint is active
@@ -194,6 +195,7 @@ export function initDraw(canvas, gridBoxSize) {
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
+    e.target.onblur = null;
   }
 
   canvas.onmousemove = e => {
@@ -205,23 +207,29 @@ export function initDraw(canvas, gridBoxSize) {
       canvas.style.cursor = "move";
       element.style.transform = `translate(${x}px, ${y}px)`;
     } else if (isCreatingContainer) {
-      startPointEle.style.opacity = 0;
-      canvas.style.cursor = "crosshair";
+      // if cursor is still moving inside the start point region,
+      // don't create the container yet
+      if (
+        Math.abs(mouse.x - snappedX) <= 10 ||
+        Math.abs(mouse.y - snappedY) <= 10
+      ) {
+        // destroyContainer(currentContainerId);
+        return;
+      }
+
+      // if mouse meant to create cont hasn't moved since clicked
+      // on start point, then remove the cont
       const snapToGridX = snapToGridLine(mouse.x, gridBoxSize);
       const snapToGridY = snapToGridLine(mouse.y, gridBoxSize);
-      const snappedStartX = snapToGridLine(mouse.startX, gridBoxSize, {
-        force: true
-      });
-      const snappedStartY = snapToGridLine(mouse.startY, gridBoxSize, {
-        force: true
-      });
 
-      element.style.width = `${Math.abs(snapToGridX - snappedStartX)}px`;
-      element.style.height = `${Math.abs(snapToGridY - snappedStartY)}px`;
+      startPointEle.style.opacity = 0;
+      canvas.style.cursor = "crosshair";
+      element.style.width = `${Math.abs(snapToGridX - snappedX)}px`;
+      element.style.height = `${Math.abs(snapToGridY - snappedY)}px`;
       element.style.left =
-        mouse.x - snappedStartX < 0 ? `${snapToGridX}px` : `${snappedStartX}px`;
+        mouse.x - snappedX < 0 ? `${snapToGridX}px` : `${snappedX}px`;
       element.style.top =
-        mouse.y - snappedStartY < 0 ? `${snapToGridY}px` : `${snappedStartY}px`;
+        mouse.y - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
     }
   };
 
@@ -231,53 +239,38 @@ export function initDraw(canvas, gridBoxSize) {
       canvas.style.cursor = "default";
       normalizeTransformToGrid(element, gridBoxSize);
     } else if (isCreatingContainer) {
+      // if cursor is still moving inside the start point region,
+      // don't create the container yet
       isCreatingContainer = false;
-
-      // if mouse meant to create cont hasn't moved since clicked
-      // on start point, then remove the cont
       if (
-        Math.abs(mouse.x - mouse.startX) < 10 &&
-        Math.abs(mouse.y - mouse.startY) < 10
+        Math.abs(mouse.x - snappedX) <= 10 ||
+        Math.abs(mouse.y - snappedY) <= 10
       ) {
-        destroyContainer(currentContainerId);
+        // destroyContainer(currentContainerId);
         return;
       }
-
       completeContainerCreation(element, gridBoxSize);
     }
   };
 
   function positionStartPoint() {
-    mouse.startX = mouse.x;
-    mouse.startY = mouse.y;
-
     destroyContainer(currentContainerId);
-
-    const x = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
-    const y = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
-
-    startPointEle.style.transform = `translate(${x - 10}px, ${y - 10}px)`;
+    startPointEle.style.transform = `translate(${snappedX - 10}px, ${snappedY -
+      10}px)`;
     startPointEle.style.opacity = 1;
   }
 
   /* Distinguish single click or double click */
   canvas.onclick = e => {
-    // if (isEditingMode) {
-    //   isEditingMode = false;
-    //   console.log("hell");
-    //   return;
-    // }
     if (e.detail === 1) {
+      // it was a single click
       firstClickedElement = e;
-      /* if this runs then for sure it was single click */
-      // firstClickTimeout = setTimeout(() => (clicks = 0), 250);
     } else if (e.detail === 2) {
       /* it was a double click */
       console.log("double click");
+      calcSnappedToXY();
       positionStartPoint();
       initTextNodeCreation(firstClickedElement);
-      // clearTimeout(firstClickTimeout);
-      // clicks = 0;
     }
   };
 
@@ -293,10 +286,9 @@ export function initDraw(canvas, gridBoxSize) {
       element = e.target.parentNode;
     } else if (e.target.id === "startPoint") {
       isCreatingContainer = true;
-      // this is the container of paragraph. removes it since user opt
-      // for container creation
-      destroyContainer(currentContainerId);
       createContainer();
+    } else if (e.target.className === "paragraph") {
+      e.target.setAttribute("spellcheck", true);
     }
   };
 }
