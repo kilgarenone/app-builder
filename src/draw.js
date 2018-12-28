@@ -63,9 +63,7 @@ function getOffsetXandY(element) {
 }
 
 function normalizeTransformToGrid(element, gridBoxSize) {
-  console.log(element.style.transform);
   const offset = getOffsetXandY(element);
-  console.log(offset);
   // might mean double clicked the drag square box without mousemove,
   // therefore, no transform data is set. if yes, don't access offset
   // array, otherwise error will be thrown
@@ -128,6 +126,11 @@ export function initDraw(canvas, gridBoxSize) {
     destroyContainer(currentParagraphId);
     canvas.style.cursor = "default";
     element.removeAttribute("id");
+    canvas.removeEventListener(
+      "mousemove",
+      handleContainerShapeCreation,
+      false
+    );
     element = null;
     console.log("div container creation finsihed.");
   }
@@ -136,6 +139,7 @@ export function initDraw(canvas, gridBoxSize) {
   function createContainer(e) {
     console.log("div container creation begun.");
     destroyContainer(currentContainerId);
+    canvas.addEventListener("mousemove", handleContainerShapeCreation, false);
     currentContainerId = Math.random();
     element = document.createElement("div");
     element.className = "rectangle";
@@ -188,44 +192,45 @@ export function initDraw(canvas, gridBoxSize) {
     e.target.onblur = null;
   }
 
-  canvas.onmousemove = e => {
-    if (isDragAnchorClicked) {
-      const x = snapToGridLine(e.pageX - mouse.startX, gridBoxSize);
-      const y = snapToGridLine(e.pageY - mouse.startY, gridBoxSize);
-      canvas.style.cursor = "move";
-      element.style.transform = `translate(${x}px, ${y}px)`;
-    } else if (isCreatingContainer) {
-      // if cursor is still moving inside the start point region,
-      // don't create the container yet
-      if (
-        Math.abs(e.pageX - snappedX) <= 10 ||
-        Math.abs(e.pageY - snappedY) <= 10
-      ) {
-        // destroyContainer(currentContainerId);
-        return;
-      }
+  function handleContainerDragging(e) {
+    const x = snapToGridLine(e.pageX - mouse.startX, gridBoxSize);
+    const y = snapToGridLine(e.pageY - mouse.startY, gridBoxSize);
+    canvas.style.cursor = "move";
+    element.style.transform = `translate(${x}px, ${y}px)`;
+  }
 
-      // if mouse meant to create cont hasn't moved since clicked
-      // on start point, then remove the cont
-      const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
-      const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
-
-      startPointEle.style.opacity = 0;
-      canvas.style.cursor = "crosshair";
-      element.style.width = `${Math.abs(snapToGridX - snappedX)}px`;
-      element.style.height = `${Math.abs(snapToGridY - snappedY)}px`;
-      element.style.left =
-        e.pageX - snappedX < 0 ? `${snapToGridX}px` : `${snappedX}px`;
-      element.style.top =
-        e.pageY - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
+  function handleContainerShapeCreation(e) {
+    // if cursor is still moving inside the start point region,
+    // don't create the container yet
+    if (
+      Math.abs(e.pageX - snappedX) <= 10 ||
+      Math.abs(e.pageY - snappedY) <= 10
+    ) {
+      // destroyContainer(currentContainerId);
+      return;
     }
-  };
+
+    // if mouse meant to create cont hasn't moved since clicked
+    // on start point, then remove the cont
+    const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
+    const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
+
+    startPointEle.style.opacity = 0;
+    canvas.style.cursor = "crosshair";
+    element.style.width = `${Math.abs(snapToGridX - snappedX)}px`;
+    element.style.height = `${Math.abs(snapToGridY - snappedY)}px`;
+    element.style.left =
+      e.pageX - snappedX < 0 ? `${snapToGridX}px` : `${snappedX}px`;
+    element.style.top =
+      e.pageY - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
+  }
 
   canvas.onmouseup = e => {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
       canvas.style.cursor = "default";
       normalizeTransformToGrid(element, gridBoxSize);
+      canvas.removeEventListener("mousemove", handleContainerDragging, false);
     } else if (isCreatingContainer) {
       // if cursor is still moving inside the start point region,
       // don't create the container yet
@@ -234,7 +239,6 @@ export function initDraw(canvas, gridBoxSize) {
         Math.abs(e.pageX - snappedX) <= 10 ||
         Math.abs(e.pageY - snappedY) <= 10
       ) {
-        // destroyContainer(currentContainerId);
         return;
       }
       completeContainerCreation(element, gridBoxSize);
@@ -268,8 +272,8 @@ export function initDraw(canvas, gridBoxSize) {
     if (e.target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
-      mouse.startX = e.pageX;
-      mouse.startY = e.pageY;
+      setMousePosition(e);
+      canvas.addEventListener("mousemove", handleContainerDragging, false);
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
       e.target.onclick = e => e.stopPropagation();
