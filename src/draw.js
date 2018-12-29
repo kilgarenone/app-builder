@@ -58,12 +58,26 @@ function createDragAnchorElement(element) {
   element.appendChild(dragAnchor);
 }
 
-function getOffsetXandY(element) {
+function getXYFromTransform(element) {
   return element.style.transform.match(/-?\d+/g);
 }
 
+function getPixelDimensionFromGridArea(element, gridBoxSize) {
+  const gridAreaInPixel = element.style.gridArea
+    .match(/-?\d+/g)
+    .map(grid => (grid - 1) * gridBoxSize);
+  const elementObj = {};
+
+  elementObj.height = gridAreaInPixel[2] - gridAreaInPixel[0];
+  elementObj.width = gridAreaInPixel[3] - gridAreaInPixel[1];
+  elementObj.left = gridAreaInPixel[1];
+  elementObj.top = gridAreaInPixel[0];
+
+  return elementObj;
+}
+
 function normalizeTransformToGrid(element, gridBoxSize) {
-  const offset = getOffsetXandY(element);
+  const offset = getXYFromTransform(element);
   // might mean double clicked the drag square box without mousemove,
   // therefore, no transform data is set. if yes, don't access offset
   // array, otherwise error will be thrown
@@ -127,24 +141,44 @@ export function initDraw(canvas, gridBoxSize) {
     svg.setAttribute("width", "24");
     svg.setAttribute("height", "24");
     svg.setAttribute("viewBox", "0 0 24 24");
+    svg.addEventListener("mousedown", initResizing, false);
 
     path.setAttribute(
       "d",
       "M17.303 20.132l2.829-2.829-1.414-1.414-2.829 2.829zM3.868 16.596l1.414 1.414L18.01 5.282l-1.414-1.414zm7.071 2.829l8.486-8.486-1.415-1.414-8.485 8.485z"
     );
     path.setAttribute("fill", "grey");
-    svg.appendChild(path);
 
-    svg.addEventListener("mousedown", handleResizingContainer, false);
+    svg.appendChild(path);
 
     element.appendChild(svg);
   }
 
-  function handleResizingContainer(e) {
-    // canvas.addEventListener('mousemove', handle)
+  function initResizing(e) {
     console.log("resiz", e);
-    if (e.target.classList.contains("resizer-top")) {
-    }
+    //
+    const target = e.target.classList.contains("resizer-grip")
+      ? e.target.parentNode
+      : e.target.parentNode.parentNode;
+
+    const dimension = getPixelDimensionFromGridArea(target, gridBoxSize);
+    console.log(dimension);
+
+    target.style.position = "absolute";
+    target.style.width = `${dimension.width}px`;
+    target.style.height = `${dimension.height}px`;
+    target.style.top = `${dimension.top}px`;
+    target.style.left = `${dimension.left}px`;
+
+    canvas.addEventListener("mousemove", handleResizing, false);
+    canvas.addEventListener("mouseup", handleStopResizing, false);
+  }
+
+  function handleResizing(e) {}
+
+  function handleStopResizing(e) {
+    canvas.removeEventListener("mousemove", handleResizing, false);
+    canvas.removeEventListener("mouseup", handleStopResizing, false);
   }
 
   function completeContainerCreation(element, gridBoxSize) {
@@ -217,9 +251,11 @@ export function initDraw(canvas, gridBoxSize) {
     // get rid of that red curly underline under texts
     e.target.setAttribute("spellcheck", false);
     e.target.parentNode.removeAttribute("id");
+
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
+
     e.target.onblur = null;
   }
 
@@ -237,7 +273,6 @@ export function initDraw(canvas, gridBoxSize) {
       Math.abs(e.pageX - snappedX) <= 10 ||
       Math.abs(e.pageY - snappedY) <= 10
     ) {
-      // destroyContainer(currentContainerId);
       return;
     }
 
@@ -256,6 +291,7 @@ export function initDraw(canvas, gridBoxSize) {
       e.pageY - snappedY < 0 ? `${snapToGridY}px` : `${snappedY}px`;
   }
 
+  // TODO: refactor to dynamic add & remove mouseup event listener
   canvas.onmouseup = e => {
     if (isDragAnchorClicked) {
       isDragAnchorClicked = false;
