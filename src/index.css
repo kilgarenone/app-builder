@@ -6,46 +6,11 @@
   border: 1px solid #ff0000;
 }
 
-.resizers {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.resizer-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 7px;
-  cursor: ns-resize;
-}
-
-.resizer-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 7px;
-  cursor: ew-resize;
-}
-
-.resizer-bottom {
+.resizer-grip {
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 7px;
-  cursor: ns-resize;
-}
-
-.resizer-left {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 7px;
-  cursor: ew-resize;
+  right: 0;
+  cursor: nwse-resize;
 }
 
 .paragraph:hover {
@@ -54,10 +19,6 @@
 
 .rectangle:hover .drag-anchor {
   opacity: 1;
-}
-
-.drag-anchor {
-  z-index: 1;
 }
 
 #startPoint {

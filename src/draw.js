@@ -98,7 +98,6 @@ export function initDraw(canvas, gridBoxSize) {
   const startPointEle = document.getElementById("startPoint");
   let snappedX = 0;
   let snappedY = 0;
-  const RESIZERS_MAPPING = ["top", "right", "bottom", "left"];
 
   function calcSnappedToXY(e) {
     snappedX = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
@@ -120,18 +119,25 @@ export function initDraw(canvas, gridBoxSize) {
     mouse.startY = e.pageY + window.pageYOffset;
   }
 
-  function createResizers(element) {
-    const resizers = document.createElement("div");
-    resizers.className = "resizers";
-    const fragment = document.createDocumentFragment();
-    RESIZERS_MAPPING.forEach(direction => {
-      const resizer = document.createElement("div");
-      resizer.className = `resizer-${direction}`;
-      fragment.appendChild(resizer);
-    });
-    resizers.addEventListener("mousedown", handleResizingContainer, false);
-    resizers.appendChild(fragment);
-    element.appendChild(resizers);
+  function createResizer(element) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+    svg.setAttribute("class", "resizer-grip");
+    svg.setAttribute("width", "24");
+    svg.setAttribute("height", "24");
+    svg.setAttribute("viewBox", "0 0 24 24");
+
+    path.setAttribute(
+      "d",
+      "M17.303 20.132l2.829-2.829-1.414-1.414-2.829 2.829zM3.868 16.596l1.414 1.414L18.01 5.282l-1.414-1.414zm7.071 2.829l8.486-8.486-1.415-1.414-8.485 8.485z"
+    );
+    path.setAttribute("fill", "grey");
+    svg.appendChild(path);
+
+    svg.addEventListener("mousedown", handleResizingContainer, false);
+
+    element.appendChild(svg);
   }
 
   function handleResizingContainer(e) {
@@ -142,9 +148,9 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function completeContainerCreation(element, gridBoxSize) {
-    snapElementToGrid(element, gridBoxSize);
     createDragAnchorElement(element);
-    createResizers(element);
+    createResizer(element);
+    snapElementToGrid(element, gridBoxSize);
     destroyContainer(currentParagraphId);
     canvas.style.cursor = "default";
     element.removeAttribute("id");
