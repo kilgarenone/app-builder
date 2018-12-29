@@ -135,7 +135,10 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function handleResizingContainer(e) {
+    // canvas.addEventListener('mousemove', handle)
     console.log("resiz", e);
+    if (e.target.classList.contains("resizer-top")) {
+    }
   }
 
   function completeContainerCreation(element, gridBoxSize) {
@@ -253,6 +256,7 @@ export function initDraw(canvas, gridBoxSize) {
       canvas.style.cursor = "default";
       normalizeTransformToGrid(element, gridBoxSize);
       canvas.removeEventListener("mousemove", handleContainerDragging, false);
+      setTimeout(() => (e.target.style.opacity = ""), 0);
     } else if (isCreatingContainer) {
       // if cursor is still moving inside the start point region,
       // don't create the container yet
@@ -292,10 +296,13 @@ export function initDraw(canvas, gridBoxSize) {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
       setMousePosition(e);
+      e.target.style.opacity = 1;
       canvas.addEventListener("mousemove", handleContainerDragging, false);
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
-      e.target.onclick = e => e.stopPropagation();
+      // e.target.onclick = e => e.stopPropagation();
+
+      // set its div 'rectangle' cont as element
       element = e.target.parentNode;
     } else if (e.target.id === "startPoint") {
       isCreatingContainer = true;

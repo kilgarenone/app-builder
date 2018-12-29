@@ -50,7 +50,6 @@
 
 .paragraph:hover {
   cursor: text;
-  /* min-height: auto; */
 }
 
 .rectangle:hover .drag-anchor {
