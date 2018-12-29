@@ -113,9 +113,13 @@ export function initDraw(canvas, gridBoxSize) {
   let snappedX = 0;
   let snappedY = 0;
 
-  function calcSnappedToXY(e) {
-    snappedX = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
-    snappedY = snapToGridLine(mouse.startY, gridBoxSize, { force: true });
+  function calcSnappedToXY({ customX, customY } = { customX: 0, customY: 0 }) {
+    snappedX = snapToGridLine(customX || mouse.startX, gridBoxSize, {
+      force: true
+    });
+    snappedY = snapToGridLine(customY || mouse.startY, gridBoxSize, {
+      force: true
+    });
   }
 
   function destroyContainer(currentContainerId) {
@@ -157,20 +161,25 @@ export function initDraw(canvas, gridBoxSize) {
   function initResizing(e) {
     console.log("resiz", e);
     //
-    const target = e.target.classList.contains("resizer-grip")
+    element = e.target.classList.contains("resizer-grip")
       ? e.target.parentNode
       : e.target.parentNode.parentNode;
 
-    const dimension = getPixelDimensionFromGridArea(target, gridBoxSize);
+    const dimension = getPixelDimensionFromGridArea(element, gridBoxSize);
     console.log(dimension);
 
-    target.style.position = "absolute";
-    target.style.width = `${dimension.width}px`;
-    target.style.height = `${dimension.height}px`;
-    target.style.top = `${dimension.top}px`;
-    target.style.left = `${dimension.left}px`;
+    element.style.position = "absolute";
+    element.style.width = `${dimension.width}px`;
+    element.style.height = `${dimension.height}px`;
+    element.style.top = `${dimension.top}px`;
+    element.style.left = `${dimension.left}px`;
 
-    canvas.addEventListener("mousemove", handleResizing, false);
+    calcSnappedToXY({
+      customX: dimension.left,
+      customY: dimension.top
+    });
+
+    canvas.addEventListener("mousemove", handleContainerShapeCreation, false);
     canvas.addEventListener("mouseup", handleStopResizing, false);
   }
 
