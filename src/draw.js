@@ -98,6 +98,7 @@ export function initDraw(canvas, gridBoxSize) {
   const startPointEle = document.getElementById("startPoint");
   let snappedX = 0;
   let snappedY = 0;
+  const RESIZERS_MAPPING = ["top", "right", "bottom", "left"];
 
   function calcSnappedToXY(e) {
     snappedX = snapToGridLine(mouse.startX, gridBoxSize, { force: true });
@@ -119,9 +120,28 @@ export function initDraw(canvas, gridBoxSize) {
     mouse.startY = e.pageY + window.pageYOffset;
   }
 
+  function createResizers(element) {
+    const resizers = document.createElement("div");
+    resizers.className = "resizers";
+    const fragment = document.createDocumentFragment();
+    RESIZERS_MAPPING.forEach(direction => {
+      const resizer = document.createElement("div");
+      resizer.className = `resizer-${direction}`;
+      fragment.appendChild(resizer);
+    });
+    resizers.addEventListener("mousedown", handleResizingContainer, false);
+    resizers.appendChild(fragment);
+    element.appendChild(resizers);
+  }
+
+  function handleResizingContainer(e) {
+    console.log("resiz", e);
+  }
+
   function completeContainerCreation(element, gridBoxSize) {
     snapElementToGrid(element, gridBoxSize);
     createDragAnchorElement(element);
+    createResizers(element);
     destroyContainer(currentParagraphId);
     canvas.style.cursor = "default";
     element.removeAttribute("id");
@@ -185,6 +205,7 @@ export function initDraw(canvas, gridBoxSize) {
       setTimeout(() => e.target.focus(), 0);
       return;
     }
+    // get rid of that red curly underline under texts
     e.target.setAttribute("spellcheck", false);
     e.target.parentNode.removeAttribute("id");
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
@@ -255,7 +276,6 @@ export function initDraw(canvas, gridBoxSize) {
 
   /* Distinguish single click or double click */
   canvas.onclick = e => {
-    console.log(e);
     if (e.detail === 2) {
       /* it was a double click */
       console.log("double click");
@@ -266,6 +286,7 @@ export function initDraw(canvas, gridBoxSize) {
     }
   };
 
+  // TODO: consider move this to individual event listener in respective element
   canvas.onmousedown = e => {
     if (e.target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
