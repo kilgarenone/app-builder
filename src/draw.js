@@ -209,7 +209,6 @@ export function initDraw(canvas, gridBoxSize) {
   function createContainer(e) {
     console.log("div container creation begun.");
     destroyContainer(currentContainerId);
-    canvas.addEventListener("mousemove", handleContainerShapeSizing, false);
     currentContainerId = Math.random();
     element = document.createElement("div");
     element.className = "rectangle";
@@ -217,6 +216,7 @@ export function initDraw(canvas, gridBoxSize) {
     element.style.position = "absolute";
     element.style.left = e.pageX + "px";
     element.style.top = e.pageY + "px";
+    canvas.addEventListener("mousemove", handleContainerShapeSizing, false);
     canvas.appendChild(element);
   }
 
@@ -315,6 +315,9 @@ export function initDraw(canvas, gridBoxSize) {
         Math.abs(e.pageX - snappedX) <= 10 ||
         Math.abs(e.pageY - snappedY) <= 10
       ) {
+        startPointEle.style.opacity = 1;
+        canvas.style.cursor = "default";
+        destroyContainer(currentContainerId);
         return;
       }
       completeContainerCreation(element, gridBoxSize);
