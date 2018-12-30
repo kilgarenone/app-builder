@@ -168,6 +168,8 @@ export function initDraw(canvas, gridBoxSize) {
     const dimension = getPixelDimensionFromGridArea(element, gridBoxSize);
     console.log(dimension);
 
+    canvas.style.cursor = "nwse-resize";
+
     element.style.position = "absolute";
     element.style.width = `${dimension.width}px`;
     element.style.height = `${dimension.height}px`;
@@ -179,15 +181,16 @@ export function initDraw(canvas, gridBoxSize) {
       customY: dimension.top
     });
 
-    canvas.addEventListener("mousemove", handleContainerShapeCreation, false);
+    canvas.addEventListener("mousemove", handleContainerShapeSizing, false);
     canvas.addEventListener("mouseup", handleStopResizing, false);
   }
 
-  function handleResizing(e) {}
-
   function handleStopResizing(e) {
-    canvas.removeEventListener("mousemove", handleResizing, false);
+    snapElementToGrid(element, gridBoxSize);
+    canvas.style.cursor = "default";
+    canvas.removeEventListener("mousemove", handleContainerShapeSizing, false);
     canvas.removeEventListener("mouseup", handleStopResizing, false);
+    element = null;
   }
 
   function completeContainerCreation(element, gridBoxSize) {
@@ -197,11 +200,7 @@ export function initDraw(canvas, gridBoxSize) {
     destroyContainer(currentParagraphId);
     canvas.style.cursor = "default";
     element.removeAttribute("id");
-    canvas.removeEventListener(
-      "mousemove",
-      handleContainerShapeCreation,
-      false
-    );
+    canvas.removeEventListener("mousemove", handleContainerShapeSizing, false);
     element = null;
     console.log("div container creation finsihed.");
   }
@@ -210,7 +209,7 @@ export function initDraw(canvas, gridBoxSize) {
   function createContainer(e) {
     console.log("div container creation begun.");
     destroyContainer(currentContainerId);
-    canvas.addEventListener("mousemove", handleContainerShapeCreation, false);
+    canvas.addEventListener("mousemove", handleContainerShapeSizing, false);
     currentContainerId = Math.random();
     element = document.createElement("div");
     element.className = "rectangle";
@@ -260,22 +259,24 @@ export function initDraw(canvas, gridBoxSize) {
     // get rid of that red curly underline under texts
     e.target.setAttribute("spellcheck", false);
     e.target.parentNode.removeAttribute("id");
+    createDragAnchorElement(e.target.parentNode);
+    createResizer(e.target.parentNode);
 
     snapElementToGrid(e.target.parentNode, gridBoxSize, {
       snapBehaviour: CEIL
     });
 
-    e.target.onblur = null;
+    e.target.onblur = e => e.target.setAttribute("spellcheck", false);
   }
 
   function handleContainerDragging(e) {
     const x = snapToGridLine(e.pageX - mouse.startX, gridBoxSize);
     const y = snapToGridLine(e.pageY - mouse.startY, gridBoxSize);
-    canvas.style.cursor = "move";
     element.style.transform = `translate(${x}px, ${y}px)`;
   }
 
-  function handleContainerShapeCreation(e) {
+  // TODO: optimizes with requestAnimationFrame API
+  function handleContainerShapeSizing(e) {
     // if cursor is still moving inside the start point region,
     // don't create the container yet
     if (
@@ -290,8 +291,6 @@ export function initDraw(canvas, gridBoxSize) {
     const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
     const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
 
-    startPointEle.style.opacity = 0;
-    canvas.style.cursor = "crosshair";
     element.style.width = `${Math.abs(snapToGridX - snappedX)}px`;
     element.style.height = `${Math.abs(snapToGridY - snappedY)}px`;
     element.style.left =
@@ -348,6 +347,7 @@ export function initDraw(canvas, gridBoxSize) {
       isDragAnchorClicked = true;
       setMousePosition(e);
       e.target.style.opacity = 1;
+      canvas.style.cursor = "move";
       canvas.addEventListener("mousemove", handleContainerDragging, false);
       // prevents after onmouseup, the click event won't
       // bubble up to the canvas's onclick handler
@@ -357,6 +357,8 @@ export function initDraw(canvas, gridBoxSize) {
       element = e.target.parentNode;
     } else if (e.target.id === "startPoint") {
       isCreatingContainer = true;
+      startPointEle.style.opacity = 0;
+      canvas.style.cursor = "crosshair";
       createContainer(e);
     } else if (e.target.className === "paragraph") {
       e.target.setAttribute("spellcheck", true);
