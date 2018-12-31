@@ -223,7 +223,7 @@ export function initDraw(canvas, gridBoxSize) {
   function initTextNodeCreation(e) {
     // TODO: Create granular gridboxes when user is
     // creating a rectangle inside another rectangle!
-    console.log("creating text node");
+    console.log("creating text node", e);
     destroyContainer(currentParagraphId);
     const container = document.createElement("div");
     currentParagraphId = Math.random();
@@ -250,9 +250,10 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   function completeTextNodeCreation(e) {
-    if (!e.target.innerText) {
+    if (!e.target.textContent) {
       // refocus previous paragraph if user single clicks elsewhere
       // while the startpoint is active
+      // TODO: find way to avoid having to re-focus cuz focus() is layout thrashing
       setTimeout(() => e.target.focus(), 0);
       return;
     }
