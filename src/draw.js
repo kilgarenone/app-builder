@@ -97,6 +97,15 @@ function normalizeTransformToGrid(element, gridBoxSize) {
   element = null;
 }
 
+function getParentByClass(element, className) {
+  if (element.classList.contains(className)) {
+    console.log("found element!", element); // returns correct element
+    return element;
+  } else {
+    return getParentByClass(element.parentNode, className);
+  }
+}
+
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
   const mouse = {
@@ -110,8 +119,20 @@ export function initDraw(canvas, gridBoxSize) {
   let isDragAnchorClicked = false;
   let element = null;
   const startPointEle = document.getElementById("startPoint");
+  startPointEle.addEventListener(
+    "mousedown",
+    handleMousedownOnStartPoint,
+    false
+  );
   let snappedX = 0;
   let snappedY = 0;
+
+  function handleMousedownOnStartPoint(e) {
+    isCreatingContainer = true;
+    startPointEle.style.opacity = 0;
+    canvas.style.cursor = "crosshair";
+    createContainer(e);
+  }
 
   function calcSnappedToXY({ customX, customY } = { customX: 0, customY: 0 }) {
     snappedX = snapToGridLine(customX || mouse.startX, gridBoxSize, {
@@ -206,7 +227,7 @@ export function initDraw(canvas, gridBoxSize) {
   }
 
   /* Creating div container on first click on anywhere in canvas */
-  function createContainer(e) {
+  function createContainer(e, container) {
     console.log("div container creation begun.");
     destroyContainer(currentContainerId);
     currentContainerId = Math.random();
@@ -217,7 +238,7 @@ export function initDraw(canvas, gridBoxSize) {
     element.style.left = e.pageX + "px";
     element.style.top = e.pageY + "px";
     canvas.addEventListener("mousemove", handleContainerShapeSizing, false);
-    canvas.appendChild(element);
+    container.appendChild(element);
   }
 
   function initTextNodeCreation(e) {
@@ -346,6 +367,7 @@ export function initDraw(canvas, gridBoxSize) {
 
   // TODO: consider move this to individual event listener in respective element
   canvas.onmousedown = e => {
+    console.log("onmousedown", e);
     if (e.target.className === "drag-anchor") {
       console.log("Clicked drag anchor ");
       isDragAnchorClicked = true;
@@ -359,11 +381,6 @@ export function initDraw(canvas, gridBoxSize) {
 
       // set its div 'rectangle' cont as element
       element = e.target.parentNode;
-    } else if (e.target.id === "startPoint") {
-      isCreatingContainer = true;
-      startPointEle.style.opacity = 0;
-      canvas.style.cursor = "crosshair";
-      createContainer(e);
     } else if (e.target.className === "paragraph") {
       e.target.setAttribute("spellcheck", true);
     }
