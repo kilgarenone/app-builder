@@ -1,5 +1,5 @@
 import { getFirstParentContainer } from "./utilities";
-import StartPoint from "./StartPoint";
+import { positionStartPoint, initStartPoint } from "./StartPoint";
 import { startAndSnapXY } from "./mouse";
 
 const CEIL = "ceil";
@@ -61,6 +61,8 @@ export function initDraw(canvas, gridBoxSize) {
   let snappedY = 0;
 
   let startPoint;
+
+  initStartPoint();
   // function createResizer(element) {
   //   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   //   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -190,11 +192,7 @@ export function initDraw(canvas, gridBoxSize) {
       /* it was a double click */
       console.log("double click");
       startAndSnapXY(e);
-      if (startPoint) {
-        startPoint.positionIt(e);
-      } else {
-        startPoint = new StartPoint(e);
-      }
+      positionStartPoint(e);
       // initTextNodeCreation(e);
     }
   };

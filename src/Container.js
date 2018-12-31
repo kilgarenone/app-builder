@@ -36,7 +36,7 @@ class Container {
   }
 
   // TODO: optimizes with requestAnimationFrame API
-  handleContainerShapeSizing(e) {
+  handleContainerShapeSizing = e => {
     // if cursor is still moving inside the start point region,
     // don't create the container yet
     if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
@@ -54,7 +54,7 @@ class Container {
       e.pageX - snapX < 0 ? `${snapToGridX}px` : `${snapX}px`;
     this.element.style.top =
       e.pageY - snapY < 0 ? `${snapToGridY}px` : `${snapY}px`;
-  }
+  };
 
   completeCreation() {
     document.removeEventListener(
@@ -66,7 +66,7 @@ class Container {
     // createResizer(element);
     snapElementToGrid(this.element, gridBoxSize);
     // destroyContainer(currentParagraphId);
-    document.style.cursor = "default";
+    document.body.style.cursor = "default";
     this.element.removeAttribute("id");
     console.log("div container creation finsihed.");
   }

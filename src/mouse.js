@@ -13,5 +13,4 @@ export function startAndSnapXY(e) {
   const { snappedX, snappedY } = calcSnappedToXY(startX, startY);
   snapX = snappedX;
   snapY = snappedY;
-  console.log(snapX, snapY);
 }
