@@ -1,5 +1,10 @@
 import { snapY, snapX, CEIL, gridBoxSize } from "./mouse";
-import { getFirstParentContainer, snapElementToGrid } from "./utilities";
+import {
+  getFirstParentContainer,
+  snapElementToGrid,
+  nestGridLines,
+  getXYRelativeToParent
+} from "./utilities";
 import { startPointEle } from "./startPoint";
 import createDragGrip from "./dragGrip";
 
@@ -12,12 +17,25 @@ export function createTextNode(element) {
     container.remove();
   }
 
+  let newX = snapX;
+  let newY = snapY;
+
   const parent = getFirstParentContainer(element, "rectangle");
+  console.log("Parent Container", parent);
+  if (parent.classList.contains("rectangle")) {
+    const { relativeX, relativeY } = getXYRelativeToParent(parent, {
+      x: snapX,
+      y: snapY
+    });
+    newX = relativeX;
+    newY = relativeY;
+    nestGridLines(parent, gridBoxSize);
+  }
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
-  container.style.left = `${snapX}px`;
-  container.style.top = `${snapY}px`;
+  container.style.left = `${newX}px`;
+  container.style.top = `${newY}px`;
 
   const paragraph = document.createElement("p");
   paragraph.className = "paragraph";

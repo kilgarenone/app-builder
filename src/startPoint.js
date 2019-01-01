@@ -15,13 +15,11 @@ export function initStartPoint() {
 }
 
 export function positionStartPoint(e) {
-  // destroyContainer(currentContainerId);
   startPointEle.style.transform = `translate(${snapX - 10}px, ${snapY - 10}px)`;
   startPointEle.style.opacity = 1;
 }
 
 function handleMouseUpOnStartPoint(e) {
-  console.log(e);
   // if cursor is still moving inside the start point region,
   // don't create the container yet
   if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {

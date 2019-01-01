@@ -30,5 +30,6 @@ export const CEIL = "ceil";
 export const ROUND = "round";
 
 export function setGridBoxSize(size) {
+  console.log(size);
   gridBoxSize = size;
 }

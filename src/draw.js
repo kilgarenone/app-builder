@@ -11,6 +11,7 @@ export function initDraw(canvas, gridBoxSize) {
   /* Distinguish single click or double click */
   canvas.onclick = e => {
     if (e.detail === 2) {
+      console.log(e);
       /* it was a double click */
       console.log("double click");
       startAndSnapXY(e);

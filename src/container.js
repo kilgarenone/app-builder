@@ -22,7 +22,7 @@ export default function createContainer(parentContainer) {
 }
 
 // TODO: optimizes with requestAnimationFrame API
-function handleContainerShapeSizing(e) {
+export function handleContainerShapeSizing(e) {
   // if cursor is still moving inside the start point region,
   // don't create the container yet
   if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
