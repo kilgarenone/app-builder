@@ -1,18 +1,28 @@
-import { calcSnappedToXY } from "./utilities";
+import { snapToGridLine } from "./utilities";
+
 export let snapX;
 export let snapY;
 export let startX;
 export let startY;
+
 export function setMousePosition(e) {
   startX = e.pageX + window.pageXOffset;
   startY = e.pageY + window.pageYOffset;
 }
 
+export function calcSnappedToXY(x, y) {
+  snapX = snapToGridLine(x, gridBoxSize, {
+    force: true
+  });
+
+  snapY = snapToGridLine(y, gridBoxSize, {
+    force: true
+  });
+}
+
 export function startAndSnapXY(e) {
   setMousePosition(e);
-  const { snappedX, snappedY } = calcSnappedToXY(startX, startY);
-  snapX = snappedX;
-  snapY = snappedY;
+  calcSnappedToXY(startX, startY);
 }
 
 export let gridBoxSize;

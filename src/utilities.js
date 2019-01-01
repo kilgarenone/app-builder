@@ -1,5 +1,3 @@
-import { gridBoxSize } from "./mouse";
-
 export function getFirstParentContainer(element, className) {
   if (element.classList.contains("canvas")) {
     return element;
@@ -11,18 +9,6 @@ export function getFirstParentContainer(element, className) {
   } else {
     return getFirstParentContainer(element.parentNode, className);
   }
-}
-
-export function calcSnappedToXY(x, y) {
-  const snappedX = snapToGridLine(x, gridBoxSize, {
-    force: true
-  });
-
-  const snappedY = snapToGridLine(y, gridBoxSize, {
-    force: true
-  });
-
-  return { snappedX, snappedY };
 }
 
 export function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
@@ -97,4 +83,18 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
   element.style.gridColumnEnd = +element.style.gridColumnEnd + offsetGridBoxesX;
 
   element.style.transform = "";
+}
+
+export function getPixelDimensionFromGridArea(element, gridBoxSize) {
+  const gridAreaInPixel = element.style.gridArea
+    .match(/-?\d+/g)
+    .map(grid => (grid - 1) * gridBoxSize);
+  const elementObj = {};
+
+  elementObj.height = gridAreaInPixel[2] - gridAreaInPixel[0];
+  elementObj.width = gridAreaInPixel[3] - gridAreaInPixel[1];
+  elementObj.left = gridAreaInPixel[1];
+  elementObj.top = gridAreaInPixel[0];
+
+  return elementObj;
 }

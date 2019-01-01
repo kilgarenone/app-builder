@@ -1,6 +1,7 @@
 import { snapElementToGrid, snapToGridLine } from "./utilities";
 import { snapY, snapX, gridBoxSize } from "./mouse";
 import createDragGrip from "./dragGrip";
+import createResizerGrip from "./resizerGrip";
 
 let container;
 export default function createContainer(parentContainer) {
@@ -45,7 +46,7 @@ export function completeContainerCreation(container) {
     false
   );
   createDragGrip(container);
-  // createResizer(element);
+  createResizerGrip(container);
   snapElementToGrid(container, gridBoxSize);
   document.body.style.cursor = "default";
   console.log("div container creation finsihed.");
