@@ -56,6 +56,7 @@ function roundPixelToGridBoxes(pixel, gridBoxSize, snapBehaviour = ROUND) {
 
 const CEIL = "ceil";
 const ROUND = "round";
+
 export function snapElementToGrid(
   element,
   gridBoxSize,
@@ -87,4 +88,28 @@ export function snapElementToGrid(
   element.style.left = "";
   element.style.width = "";
   element.style.height = "";
+}
+
+function getXYFromTransform(element) {
+  return element.style.transform.match(/-?\d+/g);
+}
+
+export function normalizeTransformToGrid(element, gridBoxSize) {
+  const offset = getXYFromTransform(element);
+  // might mean double clicked the drag square box without mousemove,
+  // therefore, no transform data is set. if yes, don't access offset
+  // array, otherwise error will be thrown
+  if (!offset) {
+    return;
+  }
+  const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
+  const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
+
+  element.style.gridRowStart = +element.style.gridRowStart + offsetGridBoxesY;
+  element.style.gridColumnStart =
+    +element.style.gridColumnStart + offsetGridBoxesX;
+  element.style.gridRowEnd = +element.style.gridRowEnd + offsetGridBoxesY;
+  element.style.gridColumnEnd = +element.style.gridColumnEnd + offsetGridBoxesX;
+
+  element.style.transform = "";
 }

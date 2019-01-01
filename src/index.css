@@ -17,7 +17,7 @@
   cursor: text;
 }
 
-.rectangle:hover .drag-anchor {
+.rectangle:hover .drag-grip {
   opacity: 1;
 }
 
@@ -56,7 +56,7 @@
   }
 }
 
-.drag-anchor {
+.drag-grip {
   width: 15px;
   height: 15px;
   background-color: black;

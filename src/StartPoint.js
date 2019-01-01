@@ -17,12 +17,12 @@ export function initStartPoint() {
 
 export function positionStartPoint(e) {
   // destroyContainer(currentContainerId);
-  document.addEventListener("mouseup", handleMouseUpOnStartPoint, false);
   startPointEle.style.transform = `translate(${snapX - 10}px, ${snapY - 10}px)`;
   startPointEle.style.opacity = 1;
 }
 
 function handleMouseUpOnStartPoint(e) {
+  console.log(e);
   // if cursor is still moving inside the start point region,
   // don't create the container yet
   // isCreatingContainer = false;
@@ -33,10 +33,22 @@ function handleMouseUpOnStartPoint(e) {
     return;
   }
   document.removeEventListener("mouseup", handleMouseUpOnStartPoint, false);
+
+  // startPointEle.removeEventListener(
+  //   "mouseup",
+  //   handleMouseUpOnStartPoint,
+  //   false
+  // );
+  // startPointEle.removeEventListener(
+  //   "mousedown",
+  //   handleMousedownOnStartPoint,
+  //   false
+  // );
   container.completeCreation();
 }
 
 function handleMousedownOnStartPoint(e) {
+  document.addEventListener("mouseup", handleMouseUpOnStartPoint, false);
   const parentContainer = getFirstParentContainer(e.target, "rectangle");
   console.log("Parent container", parentContainer);
   startPointEle.style.opacity = 0;

@@ -4,12 +4,12 @@ import {
   snapToGridLine
 } from "./utilities";
 import { snapY, snapX } from "./mouse";
+import DragGrip from "./DragGrip";
 
 const gridBoxSize = 32;
+
 class Container {
   constructor(e, parentContainer) {
-    // this.element;
-    this.currentContainerId = null;
     this.init(parentContainer);
   }
 
@@ -17,11 +17,8 @@ class Container {
     /* Creating div container on first click on anywhere in canvas */
     console.log("div container creation begun.", parentContainer);
 
-    // this.currentContainerId = Math.random();
-
     this.element = document.createElement("div");
     this.element.className = "rectangle";
-    this.element.id = this.currentContainerId;
     this.element.style.position = "absolute";
     // element.style.left = e.pageX + "px";
     // element.style.top = e.pageY + "px";
@@ -62,12 +59,12 @@ class Container {
       this.handleContainerShapeSizing,
       false
     );
-    // createDragAnchorElement(this.element);
+    const dragGrip = new DragGrip(this.element).render();
+    this.element.appendChild(dragGrip);
     // createResizer(element);
     snapElementToGrid(this.element, gridBoxSize);
     // destroyContainer(currentParagraphId);
     document.body.style.cursor = "default";
-    this.element.removeAttribute("id");
     console.log("div container creation finsihed.");
   }
   remove() {

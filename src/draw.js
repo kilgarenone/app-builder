@@ -5,16 +5,6 @@ import { startAndSnapXY } from "./mouse";
 const CEIL = "ceil";
 const ROUND = "round";
 
-function createDragAnchorElement(element) {
-  const dragAnchor = document.createElement("span");
-  dragAnchor.className = "drag-anchor";
-  element.appendChild(dragAnchor);
-}
-
-function getXYFromTransform(element) {
-  return element.style.transform.match(/-?\d+/g);
-}
-
 function getPixelDimensionFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = element.style.gridArea
     .match(/-?\d+/g)
@@ -28,27 +18,6 @@ function getPixelDimensionFromGridArea(element, gridBoxSize) {
 
   return elementObj;
 }
-
-// function normalizeTransformToGrid(element, gridBoxSize) {
-//   const offset = getXYFromTransform(element);
-//   // might mean double clicked the drag square box without mousemove,
-//   // therefore, no transform data is set. if yes, don't access offset
-//   // array, otherwise error will be thrown
-//   if (!offset) {
-//     return;
-//   }
-//   const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
-//   const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
-
-//   element.style.gridRowStart = +element.style.gridRowStart + offsetGridBoxesY;
-//   element.style.gridColumnStart =
-//     +element.style.gridColumnStart + offsetGridBoxesX;
-//   element.style.gridRowEnd = +element.style.gridRowEnd + offsetGridBoxesY;
-//   element.style.gridColumnEnd = +element.style.gridColumnEnd + offsetGridBoxesX;
-
-//   element.style.transform = "";
-//   element = null;
-// }
 
 // adapted from https://stackoverflow.com/a/17409472/73323
 export function initDraw(canvas, gridBoxSize) {
@@ -169,12 +138,6 @@ export function initDraw(canvas, gridBoxSize) {
   //   e.target.onblur = e => e.target.setAttribute("spellcheck", false);
   // }
 
-  // function handleContainerDragging(e) {
-  //   const x = snapToGridLine(e.pageX - mouse.startX, gridBoxSize);
-  //   const y = snapToGridLine(e.pageY - mouse.startY, gridBoxSize);
-  //   element.style.transform = `translate(${x}px, ${y}px)`;
-  // }
-
   // TODO: refactor to dynamic add & remove mouseup event listener
   // canvas.onmouseup = e => {
   //   if (isDragAnchorClicked) {
@@ -199,19 +162,6 @@ export function initDraw(canvas, gridBoxSize) {
 
   // TODO: consider move this to individual event listener in respective element
   canvas.onmousedown = e => {
-    //   console.log("onmousedown", e);
-    //   if (e.target.className === "drag-anchor") {
-    //     console.log("Clicked drag anchor ");
-    //     isDragAnchorClicked = true;
-    //     setMousePosition(e);
-    //     e.target.style.opacity = 1;
-    //     canvas.style.cursor = "move";
-    //     canvas.addEventListener("mousemove", handleContainerDragging, false);
-    //     // prevents after onmouseup, the click event won't
-    //     // bubble up to the canvas's onclick handler
-    //     // e.target.onclick = e => e.stopPropagation();
-    //     // set its div 'rectangle' cont as element
-    //     element = e.target.parentNode;
     //   } else if (e.target.className === "paragraph") {
     //     e.target.setAttribute("spellcheck", true);
     //   }
