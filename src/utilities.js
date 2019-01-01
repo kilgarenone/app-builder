@@ -1,4 +1,5 @@
-const gridBoxSize = 32;
+import { gridBoxSize } from "./mouse";
+
 export function getFirstParentContainer(element, className) {
   if (element.classList.contains("canvas")) {
     return element;

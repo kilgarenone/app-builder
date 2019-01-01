@@ -14,3 +14,11 @@ export function startAndSnapXY(e) {
   snapX = snappedX;
   snapY = snappedY;
 }
+
+export let gridBoxSize;
+export const CEIL = "ceil";
+export const ROUND = "round";
+
+export function setGridBoxSize(size) {
+  gridBoxSize = size;
+}

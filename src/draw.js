@@ -1,9 +1,7 @@
 import { getFirstParentContainer } from "./utilities";
 import { positionStartPoint, initStartPoint } from "./StartPoint";
-import { startAndSnapXY } from "./mouse";
-
-const CEIL = "ceil";
-const ROUND = "round";
+import { startAndSnapXY, setGridBoxSize } from "./mouse";
+import { createTextNode } from "./Text";
 
 function getPixelDimensionFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = element.style.gridArea
@@ -32,6 +30,7 @@ export function initDraw(canvas, gridBoxSize) {
   let startPoint;
 
   initStartPoint();
+  setGridBoxSize(gridBoxSize);
   // function createResizer(element) {
   //   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   //   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -88,56 +87,6 @@ export function initDraw(canvas, gridBoxSize) {
   //   element = null;
   // }
 
-  // function initTextNodeCreation(e) {
-  //   // TODO: Create granular gridboxes when user is
-  //   // creating a rectangle inside another rectangle!
-  //   console.log("creating text node", e);
-  //   destroyContainer(currentParagraphId);
-  //   const container = document.createElement("div");
-  //   currentParagraphId = Math.random();
-  //   container.id = currentParagraphId;
-  //   container.className = "rectangle";
-  //   container.style.position = "absolute";
-  //   container.style.left = `${snappedX}px`;
-  //   container.style.top = `${snappedY}px`;
-
-  //   const paragraph = document.createElement("p");
-  //   paragraph.className = "paragraph";
-  //   paragraph.contentEditable = true;
-  //   paragraph.style.transform = "scale(0, 0)";
-  //   paragraph.oninput = () => {
-  //     paragraph.style.transform = "scale(1, 1)";
-  //     startPointEle.style.opacity = 0;
-  //     destroyContainer(currentContainerId);
-  //     paragraph.oninput = null;
-  //   };
-  //   paragraph.onblur = completeTextNodeCreation;
-  //   container.appendChild(paragraph);
-  //   e.target.appendChild(container);
-  //   paragraph.focus();
-  // }
-
-  // function completeTextNodeCreation(e) {
-  //   if (!e.target.textContent) {
-  //     // refocus previous paragraph if user single clicks elsewhere
-  //     // while the startpoint is active
-  //     // TODO: find way to avoid having to re-focus cuz focus() is layout thrashing
-  //     setTimeout(() => e.target.focus(), 0);
-  //     return;
-  //   }
-  //   // get rid of that red curly underline under texts
-  //   e.target.setAttribute("spellcheck", false);
-  //   e.target.parentNode.removeAttribute("id");
-  //   createDragAnchorElement(e.target.parentNode);
-  //   createResizer(e.target.parentNode);
-
-  //   snapElementToGrid(e.target.parentNode, gridBoxSize, {
-  //     snapBehaviour: CEIL
-  //   });
-
-  //   e.target.onblur = e => e.target.setAttribute("spellcheck", false);
-  // }
-
   // TODO: refactor to dynamic add & remove mouseup event listener
   // canvas.onmouseup = e => {
   //   if (isDragAnchorClicked) {
@@ -156,7 +105,7 @@ export function initDraw(canvas, gridBoxSize) {
       console.log("double click");
       startAndSnapXY(e);
       positionStartPoint(e);
-      // initTextNodeCreation(e);
+      createTextNode(e.target);
     }
   };
 

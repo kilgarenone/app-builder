@@ -3,10 +3,8 @@ import {
   snapElementToGrid,
   snapToGridLine
 } from "./utilities";
-import { snapY, snapX } from "./mouse";
-import DragGrip from "./DragGrip";
-
-const gridBoxSize = 32;
+import { snapY, snapX, gridBoxSize } from "./mouse";
+import createDragGrip from "./dragGrip";
 
 class Container {
   constructor(e, parentContainer) {
@@ -59,8 +57,7 @@ class Container {
       this.handleContainerShapeSizing,
       false
     );
-    const dragGrip = new DragGrip(this.element).render();
-    this.element.appendChild(dragGrip);
+    createDragGrip(this.element);
     // createResizer(element);
     snapElementToGrid(this.element, gridBoxSize);
     // destroyContainer(currentParagraphId);

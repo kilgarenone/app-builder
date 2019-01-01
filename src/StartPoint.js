@@ -2,8 +2,8 @@ import { getFirstParentContainer } from "./utilities";
 import Container from "./Container";
 import { snapY, snapX } from "./mouse";
 
-let startPointEle;
 let container;
+export let startPointEle;
 
 export function initStartPoint() {
   startPointEle = document.getElementById("startPoint");
