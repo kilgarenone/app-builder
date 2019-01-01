@@ -1,21 +1,22 @@
 import { setMousePosition, startX, startY, gridBoxSize } from "./mouse";
-import { snapToGridLine, normalizeTransformToGrid } from "./utilities";
+import {
+  snapToGridLine,
+  normalizeTransformToGrid,
+  getFirstParentContainer
+} from "./utilities";
 
 let container;
 let dragGrip;
 
 function handleMouseDown(e) {
   console.log("Clicked drag anchor ");
+  container = getFirstParentContainer(e.target, "rectangle");
+  dragGrip = e.target;
   setMousePosition(e);
   dragGrip.style.opacity = 1;
   document.body.style.cursor = "move";
   document.body.addEventListener("mousemove", handleContainerDragging, false);
   document.body.addEventListener("mouseup", handleMouseUp, false);
-  // prevents after onmouseup, the click event won't
-  // bubble up to the canvas's onclick handler
-  // e.target.onclick = e => e.stopPropagation();
-  // set its div 'rectangle' cont as element
-  // element = e.target.parentNode;
 }
 
 function handleMouseUp(e) {
@@ -39,9 +40,8 @@ function handleContainerDragging(e) {
 }
 
 export default function createDragGrip(target) {
-  container = target;
-  dragGrip = document.createElement("span");
+  const dragGrip = document.createElement("span");
   dragGrip.className = "drag-grip";
   dragGrip.addEventListener("mousedown", handleMouseDown, false);
-  container.appendChild(dragGrip);
+  target.appendChild(dragGrip);
 }

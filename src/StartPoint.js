@@ -1,5 +1,5 @@
 import { getFirstParentContainer } from "./utilities";
-import Container from "./Container";
+import createContainer, { completeContainerCreation } from "./Container";
 import { snapY, snapX } from "./mouse";
 
 let container;
@@ -44,7 +44,7 @@ function handleMouseUpOnStartPoint(e) {
   //   handleMousedownOnStartPoint,
   //   false
   // );
-  container.completeCreation();
+  completeContainerCreation(container);
 }
 
 function handleMousedownOnStartPoint(e) {
@@ -53,5 +53,5 @@ function handleMousedownOnStartPoint(e) {
   console.log("Parent container", parentContainer);
   startPointEle.style.opacity = 0;
   document.body.style.cursor = "crosshair";
-  container = new Container(e, parentContainer);
+  container = createContainer(parentContainer);
 }

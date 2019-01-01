@@ -13,18 +13,6 @@ export function getFirstParentContainer(element, className) {
   }
 }
 
-export function destroyContainer(id) {
-  if (!id) {
-    return;
-  }
-
-  const element = document.getElementById(id);
-
-  if (element) {
-    element.remove();
-  }
-}
-
 export function calcSnappedToXY(x, y) {
   const snappedX = snapToGridLine(x, gridBoxSize, {
     force: true
@@ -58,11 +46,7 @@ function roundPixelToGridBoxes(pixel, gridBoxSize, snapBehaviour = ROUND) {
 const CEIL = "ceil";
 const ROUND = "round";
 
-export function snapElementToGrid(
-  element,
-  gridBoxSize,
-  { snapBehaviour } = { snapBehaviour: ROUND }
-) {
+export function snapElementToGrid(element, gridBoxSize) {
   const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
   const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
   const width = roundPixelToGridBoxes(
