@@ -1,4 +1,4 @@
-import { snapY, snapX, CEIL, gridBoxSize } from "./mouse";
+import { CEIL, gridBoxSize, calcSnappedToXY } from "./mouse";
 import {
   getFirstParentContainer,
   snapElementToGrid,
@@ -7,35 +7,39 @@ import {
 } from "./utilities";
 import { startPointEle } from "./startPoint";
 import createDragGrip from "./dragGrip";
+import createResizerGrip from "./resizerGrip";
 
 let container = null;
+let snapX;
+let snapY;
 
-export function createTextNode(element) {
+export function createTextNode(e) {
   // user has moved on to new start point, so removes
   // last text node that was unutilized
   if (container) {
     container.remove();
   }
 
-  let newX = snapX;
-  let newY = snapY;
+  const { x, y } = calcSnappedToXY(e);
+  snapX = x;
+  snapY = y;
 
-  const parent = getFirstParentContainer(element, "rectangle");
+  const parent = getFirstParentContainer(e.target, "rectangle");
   console.log("Parent Container", parent);
   if (parent.classList.contains("rectangle")) {
     const { relativeX, relativeY } = getXYRelativeToParent(parent, {
       x: snapX,
       y: snapY
     });
-    newX = relativeX;
-    newY = relativeY;
+    snapX = relativeX;
+    snapY = relativeY;
     nestGridLines(parent, gridBoxSize);
   }
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
-  container.style.left = `${newX}px`;
-  container.style.top = `${newY}px`;
+  container.style.left = `${snapX}px`;
+  container.style.top = `${snapY}px`;
 
   const paragraph = document.createElement("p");
   paragraph.className = "paragraph";
@@ -67,7 +71,7 @@ function completeTextNodeCreation(e) {
   e.target.setAttribute("spellcheck", false);
   createDragGrip(e.target.parentNode);
 
-  // createResizer(e.target.parentNode);
+  createResizerGrip(e.target.parentNode);
 
   snapElementToGrid(e.target.parentNode, gridBoxSize, {
     snapBehaviour: CEIL

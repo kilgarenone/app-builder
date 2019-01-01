@@ -1,8 +1,10 @@
 import { getFirstParentContainer } from "./utilities";
 import createContainer, { completeContainerCreation } from "./container";
-import { snapY, snapX } from "./mouse";
+import { calcSnappedToXY } from "./mouse";
 
 let container;
+let snapX;
+let snapY;
 export let startPointEle;
 
 export function initStartPoint() {
@@ -15,6 +17,10 @@ export function initStartPoint() {
 }
 
 export function positionStartPoint(e) {
+  const { x, y } = calcSnappedToXY(e);
+  snapX = x;
+  snapY = y;
+
   startPointEle.style.transform = `translate(${snapX - 10}px, ${snapY - 10}px)`;
   startPointEle.style.opacity = 1;
 }
@@ -43,5 +49,5 @@ function handleMousedownOnStartPoint(e) {
   console.log("Parent container", parentContainer);
   startPointEle.style.opacity = 0;
   document.body.style.cursor = "crosshair";
-  container = createContainer(parentContainer);
+  container = createContainer(e, parentContainer);
 }

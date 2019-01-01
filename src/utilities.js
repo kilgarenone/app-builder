@@ -87,7 +87,7 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
 
 export function getPixelDimensionFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = parseRowsColumnsFromGridArea(element).map(
-    grid => (grid - 1) * 32
+    grid => (grid - 1) * gridBoxSize
   );
   console.log(gridAreaInPixel);
   const elementObj = {};

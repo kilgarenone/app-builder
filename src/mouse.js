@@ -1,28 +1,22 @@
 import { snapToGridLine } from "./utilities";
 
-export let snapX;
-export let snapY;
-export let startX;
-export let startY;
-
 export function setMousePosition(e) {
-  startX = e.pageX + window.pageXOffset;
-  startY = e.pageY + window.pageYOffset;
+  return {
+    x: e.pageX + window.pageXOffset,
+    y: e.pageY + window.pageYOffset
+  };
 }
 
-export function calcSnappedToXY(x, y) {
-  snapX = snapToGridLine(x, gridBoxSize, {
+export function calcSnappedToXY(e) {
+  const x = snapToGridLine(e.pageX + window.pageXOffset, gridBoxSize, {
     force: true
   });
 
-  snapY = snapToGridLine(y, gridBoxSize, {
+  const y = snapToGridLine(e.pageY + window.pageYOffset, gridBoxSize, {
     force: true
   });
-}
 
-export function startAndSnapXY(e) {
-  setMousePosition(e);
-  calcSnappedToXY(startX, startY);
+  return { x, y };
 }
 
 export let gridBoxSize;
@@ -30,6 +24,6 @@ export const CEIL = "ceil";
 export const ROUND = "round";
 
 export function setGridBoxSize(size) {
-  console.log(size);
+  console.log("grid box size", size);
   gridBoxSize = size;
 }

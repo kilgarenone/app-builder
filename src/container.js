@@ -1,15 +1,21 @@
 import { snapElementToGrid, snapToGridLine } from "./utilities";
-import { snapY, snapX, gridBoxSize } from "./mouse";
+import { gridBoxSize, calcSnappedToXY } from "./mouse";
 import createDragGrip from "./dragGrip";
 import createResizerGrip from "./resizerGrip";
 
 let container;
-export default function createContainer(parentContainer) {
-  console.log("div container creation begun.", parentContainer);
+let snapX;
+let snapY;
 
+export default function createContainer(e, parentContainer) {
+  console.log("div container creation begun.", parentContainer);
+  const { x, y } = calcSnappedToXY(e);
+  snapX = x;
+  snapY = y;
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
+
   document.body.addEventListener(
     "mousemove",
     handleContainerShapeSizing,

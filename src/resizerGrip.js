@@ -2,12 +2,15 @@ import {
   getFirstParentContainer,
   getPixelDimensionFromGridArea,
   snapElementToGrid,
-  snapToGridLine
+  snapToGridLine,
+  getXYRelativeToParent
 } from "./utilities";
-import { snapY, snapX, gridBoxSize, calcSnappedToXY } from "./mouse";
+import { gridBoxSize, calcSnappedToXY } from "./mouse";
 
 let container;
 let dragGripEle;
+let snapX;
+let snapY;
 
 export default function createResizerGrip(element) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -32,11 +35,23 @@ export default function createResizerGrip(element) {
 }
 
 function initResizing(e) {
+  const { x, y } = calcSnappedToXY(e);
+  snapX = x;
+  snapY = y;
   container = getFirstParentContainer(e.target, "rectangle");
   dragGripEle = container.querySelector(".drag-grip");
   dragGripEle.style.opacity = "0";
 
   const dimension = getPixelDimensionFromGridArea(container, gridBoxSize);
+
+  if (container.classList.contains("rectangle")) {
+    const { relativeX, relativeY } = getXYRelativeToParent(container, {
+      x: snapX,
+      y: snapY
+    });
+    dimension.top = relativeY;
+    dimension.left = relativeX;
+  }
 
   document.body.style.cursor = "nwse-resize";
 

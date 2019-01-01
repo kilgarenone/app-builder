@@ -1,4 +1,4 @@
-import { setMousePosition, startX, startY, gridBoxSize } from "./mouse";
+import { setMousePosition, gridBoxSize } from "./mouse";
 import {
   snapToGridLine,
   normalizeTransformToGrid,
@@ -7,12 +7,16 @@ import {
 
 let container;
 let dragGrip;
+let startX;
+let startY;
 
 function handleMouseDown(e) {
   console.log("Clicked drag anchor ");
   container = getFirstParentContainer(e.target, "rectangle");
   dragGrip = e.target;
-  setMousePosition(e);
+  const { x, y } = setMousePosition(e);
+  startX = x;
+  startY = y;
   dragGrip.style.opacity = 1;
   document.body.style.cursor = "move";
   document.body.addEventListener("mousemove", handleContainerDragging, false);
