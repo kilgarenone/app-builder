@@ -7,6 +7,7 @@ import {
 import { snapY, snapX, gridBoxSize, calcSnappedToXY } from "./mouse";
 
 let container;
+let dragGripEle;
 
 export default function createResizerGrip(element) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -32,6 +33,8 @@ export default function createResizerGrip(element) {
 
 function initResizing(e) {
   container = getFirstParentContainer(e.target, "rectangle");
+  dragGripEle = container.querySelector(".drag-grip");
+  dragGripEle.style.opacity = "0";
 
   const dimension = getPixelDimensionFromGridArea(container, gridBoxSize);
 
@@ -66,6 +69,7 @@ function handleContainerShapeSizing(e) {
 
 function handleStopResizing(e) {
   document.body.style.cursor = "default";
+  dragGripEle.style.opacity = "";
   snapElementToGrid(container, gridBoxSize);
   document.body.removeEventListener(
     "mousemove",
