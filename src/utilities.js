@@ -1,3 +1,5 @@
+import { gridBoxSize } from "./mouse";
+
 export function getFirstParentContainer(element, className) {
   if (element.classList.contains("canvas")) {
     return element;
@@ -117,6 +119,6 @@ export function nestGridLines(container, gridBoxSize) {
 }
 
 export function getXYRelativeToParent(container, { x, y }) {
-  const { top, left } = getPixelDimensionFromGridArea(container);
+  const { top, left } = getPixelDimensionFromGridArea(container, gridBoxSize);
   return { relativeX: x - left, relativeY: y - top };
 }
