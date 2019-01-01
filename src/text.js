@@ -1,6 +1,6 @@
 import { snapY, snapX, CEIL, gridBoxSize } from "./mouse";
 import { getFirstParentContainer, snapElementToGrid } from "./utilities";
-import { startPointEle } from "./StartPoint";
+import { startPointEle } from "./startPoint";
 import createDragGrip from "./dragGrip";
 
 let container = null;

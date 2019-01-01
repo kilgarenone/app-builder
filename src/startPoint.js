@@ -1,5 +1,5 @@
 import { getFirstParentContainer } from "./utilities";
-import createContainer, { completeContainerCreation } from "./Container";
+import createContainer, { completeContainerCreation } from "./container";
 import { snapY, snapX } from "./mouse";
 
 let container;

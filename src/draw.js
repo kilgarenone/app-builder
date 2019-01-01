@@ -1,7 +1,7 @@
 import { getFirstParentContainer } from "./utilities";
-import { positionStartPoint, initStartPoint } from "./StartPoint";
+import { positionStartPoint, initStartPoint } from "./startPoint";
 import { startAndSnapXY, setGridBoxSize } from "./mouse";
-import { createTextNode } from "./Text";
+import { createTextNode } from "./text";
 
 function getPixelDimensionFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = element.style.gridArea
