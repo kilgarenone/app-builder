@@ -1,4 +1,4 @@
-import { CEIL, gridBoxSize, calcSnappedToXY } from "./mouse";
+import { CEIL, gridBoxSize, snapToXY } from "./mouse";
 import {
   getFirstParentContainer,
   snapElementToGrid,
@@ -20,7 +20,7 @@ export function createTextNode(e) {
     container.remove();
   }
 
-  const { x, y } = calcSnappedToXY(e);
+  const { x, y } = snapToXY(e);
   snapX = x;
   snapY = y;
 

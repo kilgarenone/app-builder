@@ -7,12 +7,24 @@ export function setMousePosition(e) {
   };
 }
 
-export function calcSnappedToXY(e) {
+export function snapToXY(e) {
   const x = snapToGridLine(e.pageX + window.pageXOffset, gridBoxSize, {
     force: true
   });
 
   const y = snapToGridLine(e.pageY + window.pageYOffset, gridBoxSize, {
+    force: true
+  });
+
+  return { x, y };
+}
+
+export function snapToCustomXY(customX, customY) {
+  const x = snapToGridLine(customX, gridBoxSize, {
+    force: true
+  });
+
+  const y = snapToGridLine(customY, gridBoxSize, {
     force: true
   });
 

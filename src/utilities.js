@@ -1,16 +1,31 @@
 import { gridBoxSize } from "./mouse";
 
 export function getFirstParentContainer(element, className) {
-  if (element.classList.contains("canvas")) {
-    return element;
+  // search until element that has 'className' OR
+  // class="canvas" element
+  while (
+    !element.classList.contains(className) &&
+    !element.classList.contains("canvas")
+  ) {
+    element = element.parentNode;
+  }
+  console.log(element);
+  return element;
+}
+
+export function getAllParentContainers(element, className) {
+  const parents = [];
+  // all all parents that has 'className', and stop iterate
+  // class="canvas" element
+  while (
+    element.classList.contains(className) &&
+    !element.classList.contains("canvas")
+  ) {
+    element = element.parentNode;
+    parents.push(element);
   }
 
-  if (element.classList.contains(className)) {
-    console.log("found element!", element); // returns correct element
-    return element;
-  } else {
-    return getFirstParentContainer(element.parentNode, className);
-  }
+  return parents;
 }
 
 export function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {

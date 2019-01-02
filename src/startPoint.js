@@ -1,6 +1,6 @@
 import { getFirstParentContainer } from "./utilities";
 import createContainer, { completeContainerCreation } from "./container";
-import { calcSnappedToXY } from "./mouse";
+import { snapToXY } from "./mouse";
 
 let container;
 let snapX;
@@ -17,7 +17,7 @@ export function initStartPoint() {
 }
 
 export function positionStartPoint(e) {
-  const { x, y } = calcSnappedToXY(e);
+  const { x, y } = snapToXY(e);
   snapX = x;
   snapY = y;
 
