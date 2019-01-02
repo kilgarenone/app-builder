@@ -1,13 +1,9 @@
 import { gridBoxSize } from "./mouse";
 
 export function getFirstParentContainer(element, className) {
-  // search until element that has 'className' OR
-  // class="canvas" element
-  while (
-    !element.classList.contains(className) &&
-    !element.classList.contains("canvas")
-  ) {
-    element = element.parentNode;
+  // search until element that has 'className'
+  while (!element.classList.contains(className)) {
+    element = element.parentElement;
   }
   return element;
 }
@@ -15,12 +11,11 @@ export function getFirstParentContainer(element, className) {
 export function getAllParentContainers(element, className) {
   const parents = [];
   // traverse upwards to get all elements that has 'className',
-  // and stop when encounter class="canvas" element
-  while (!element.classList.contains("canvas")) {
+  while (element) {
     if (element.classList.contains(className)) {
       parents.push(element);
     }
-    element = element.parentNode;
+    element = element.parentElement;
   }
 
   return parents;
@@ -151,4 +146,10 @@ export function getTotalTopLeftOffset(containers) {
   }
 
   return { offsetTop, offsetLeft };
+}
+
+export function getFirstParentOrCanvasIfNoneExists(parents) {
+  return parents.length
+    ? parents[parents.length - 1]
+    : document.getElementById("canvas");
 }

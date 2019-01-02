@@ -1,4 +1,7 @@
-import { getFirstParentContainer } from "./utilities";
+import {
+  getAllParentContainers,
+  getFirstParentOrCanvasIfNoneExists
+} from "./utilities";
 import createContainer, { completeContainerCreation } from "./container";
 import { snapToXY } from "./mouse";
 
@@ -45,7 +48,8 @@ function handleMouseUpOnStartPoint(e) {
 
 function handleMousedownOnStartPoint(e) {
   document.body.addEventListener("mouseup", handleMouseUpOnStartPoint, false);
-  const parentContainer = getFirstParentContainer(e.target, "rectangle");
+  const parents = getAllParentContainers(e.target, "rectangle");
+  const parentContainer = getFirstParentOrCanvasIfNoneExists(parents);
   console.log("Parent container", parentContainer);
   startPointEle.style.opacity = 0;
   document.body.style.cursor = "crosshair";

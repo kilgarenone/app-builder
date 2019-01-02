@@ -17,7 +17,7 @@ class App extends Component {
   render() {
     return (
       <div
-        className="canvas"
+        id="canvas"
         style={{
           display: "grid",
           maxHeight: "100vh",
