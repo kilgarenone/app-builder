@@ -1,14 +1,10 @@
+import { gridBoxSize } from "./mouse";
 import {
-  getFirstParentContainer,
+  getAllParentContainers,
   getDimensionInPixelFromGridArea,
   snapElementToGrid,
-  snapToGridLine,
-  getAllParentContainers,
-  getLastParentOrCanvasIfNoneExists,
-  getXYRelativeToParent,
-  getTotalTopLeftOffset
+  snapToGridLine
 } from "./utilities";
-import { gridBoxSize, snapToXY, snapToCustomXY } from "./mouse";
 
 let container;
 let dragGripEle;

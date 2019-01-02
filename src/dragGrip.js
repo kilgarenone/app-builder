@@ -1,8 +1,8 @@
-import { setMousePosition, gridBoxSize } from "./mouse";
+import { gridBoxSize, setMousePosition } from "./mouse";
 import {
-  snapToGridLine,
+  getFirstParentContainer,
   normalizeTransformToGrid,
-  getFirstParentContainer
+  snapToGridLine
 } from "./utilities";
 
 let container;
