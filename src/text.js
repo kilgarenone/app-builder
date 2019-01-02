@@ -5,7 +5,7 @@ import {
   nestGridLines,
   getXYRelativeToParent,
   getAllParentContainers,
-  getFirstParentOrCanvasIfNoneExists
+  getLastParentOrCanvasIfNoneExists
 } from "./utilities";
 import { startPointEle } from "./startPoint";
 import createDragGrip from "./dragGrip";
@@ -28,9 +28,7 @@ export function createTextNode(e) {
 
   // TODO: try get last parent container instead
   const parents = getAllParentContainers(e.target, "rectangle");
-  const parent = getFirstParentOrCanvasIfNoneExists(parents);
-  console.log("Parent Containers", parents);
-  console.log("parent", parent);
+  const parent = getLastParentOrCanvasIfNoneExists(parents);
   if (parents.length) {
     const { relativeX, relativeY } = getXYRelativeToParent(parent, {
       x: snapX,

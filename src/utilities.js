@@ -148,7 +148,7 @@ export function getTotalTopLeftOffset(containers) {
   return { offsetTop, offsetLeft };
 }
 
-export function getFirstParentOrCanvasIfNoneExists(parents) {
+export function getLastParentOrCanvasIfNoneExists(parents) {
   return parents.length
     ? parents[parents.length - 1]
     : document.getElementById("canvas");
