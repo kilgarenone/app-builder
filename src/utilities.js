@@ -104,7 +104,6 @@ export function getDimensionInPixelFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = parseRowsColumnsFromGridArea(element).map(
     grid => (grid - 1) * gridBoxSize
   );
-  console.log(gridAreaInPixel);
   const elementObj = {};
 
   elementObj.height = gridAreaInPixel[2] - gridAreaInPixel[0];

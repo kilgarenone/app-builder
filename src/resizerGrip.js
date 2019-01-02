@@ -44,10 +44,11 @@ function initResizing(e) {
   container = parentContainers[0];
   dragGripEle = container.querySelector(".drag-grip");
   dragGripEle.style.opacity = "0";
+  offsetX = 0;
+  offsetY = 0;
 
   const dimension = getDimensionInPixelFromGridArea(container, gridBoxSize);
   if (parentContainers.length > 1) {
-    // const
     // const { offsetTop, offsetLeft } = getTotalTopLeftOffset(parentContainers);
     // console.log(offsetTop, offsetLeft);
     const { top, left } = getDimensionInPixelFromGridArea(
@@ -57,7 +58,6 @@ function initResizing(e) {
     offsetX = left;
     offsetY = top;
   }
-  console.log("dimension", dimension);
 
   document.body.style.cursor = "nwse-resize";
 
@@ -69,8 +69,6 @@ function initResizing(e) {
   // remember to removes grid-area to prevent it messing around
   container.style.gridArea = "";
 
-  console.log("snapx", snapX);
-  console.log("snapY", snapY);
   snapX = dimension.left;
   snapY = dimension.top;
 
@@ -83,7 +81,8 @@ function initResizing(e) {
 }
 
 function handleContainerShapeSizing(e) {
-  console.log(e);
+  console.log("snapX", snapX);
+  console.log("pageX", e.pageX);
   const snapToGridX = snapToGridLine(e.pageX - offsetX, gridBoxSize);
   const snapToGridY = snapToGridLine(e.pageY - offsetY, gridBoxSize);
 
