@@ -1,6 +1,6 @@
 import {
   getFirstParentContainer,
-  getPixelDimensionFromGridArea,
+  getDimensionInPixelFromGridArea,
   snapElementToGrid,
   snapToGridLine,
   getAllParentContainers,
@@ -13,6 +13,8 @@ let container;
 let dragGripEle;
 let snapX;
 let snapY;
+let offsetX = 0;
+let offsetY = 0;
 
 export default function createResizerGrip(element) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -43,11 +45,18 @@ function initResizing(e) {
   dragGripEle = container.querySelector(".drag-grip");
   dragGripEle.style.opacity = "0";
 
-  if (container.classList.contains("rectangle")) {
-    const { offsetTop, offsetLeft } = getTotalTopLeftOffset(parentContainers);
-    console.log(offsetTop, offsetLeft);
+  const dimension = getDimensionInPixelFromGridArea(container, gridBoxSize);
+  if (parentContainers.length > 1) {
+    // const
+    // const { offsetTop, offsetLeft } = getTotalTopLeftOffset(parentContainers);
+    // console.log(offsetTop, offsetLeft);
+    const { top, left } = getDimensionInPixelFromGridArea(
+      parentContainers[parentContainers.length - 1],
+      gridBoxSize
+    );
+    offsetX = left;
+    offsetY = top;
   }
-  const dimension = getPixelDimensionFromGridArea(container, gridBoxSize);
   console.log("dimension", dimension);
 
   document.body.style.cursor = "nwse-resize";
@@ -57,7 +66,11 @@ function initResizing(e) {
   container.style.height = `${dimension.height}px`;
   container.style.top = `${dimension.top}px`;
   container.style.left = `${dimension.left}px`;
+  // remember to removes grid-area to prevent it messing around
+  container.style.gridArea = "";
 
+  console.log("snapx", snapX);
+  console.log("snapY", snapY);
   snapX = dimension.left;
   snapY = dimension.top;
 
@@ -70,8 +83,9 @@ function initResizing(e) {
 }
 
 function handleContainerShapeSizing(e) {
-  const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
-  const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
+  console.log(e);
+  const snapToGridX = snapToGridLine(e.pageX - offsetX, gridBoxSize);
+  const snapToGridY = snapToGridLine(e.pageY - offsetY, gridBoxSize);
 
   container.style.width = `${Math.abs(snapToGridX - snapX)}px`;
   container.style.height = `${Math.abs(snapToGridY - snapY)}px`;

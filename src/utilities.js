@@ -100,7 +100,7 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
   element.style.transform = "";
 }
 
-export function getPixelDimensionFromGridArea(element, gridBoxSize) {
+export function getDimensionInPixelFromGridArea(element, gridBoxSize) {
   const gridAreaInPixel = parseRowsColumnsFromGridArea(element).map(
     grid => (grid - 1) * gridBoxSize
   );
@@ -129,10 +129,12 @@ export function nestGridLines(container, gridBoxSize) {
 
   container.style.display = "grid";
   container.style.gridTemplate = `repeat(${rowsCount}, ${gridBoxSize}px) / repeat(${colsCount}, ${gridBoxSize}px)`;
+  container.style.gridAutoColumns = `${gridBoxSize}px`;
+  container.style.gridAutoRows = `${gridBoxSize}px`;
 }
 
 export function getXYRelativeToParent(container, { x, y }) {
-  const { top, left } = getPixelDimensionFromGridArea(container, gridBoxSize);
+  const { top, left } = getDimensionInPixelFromGridArea(container, gridBoxSize);
   return { relativeX: x - left, relativeY: y - top };
 }
 
@@ -141,7 +143,7 @@ export function getTotalTopLeftOffset(containers) {
   let offsetLeft = 0;
 
   for (let index = 0; index < containers.length; index++) {
-    const { top, left } = getPixelDimensionFromGridArea(
+    const { top, left } = getDimensionInPixelFromGridArea(
       containers[index],
       gridBoxSize
     );
