@@ -4,7 +4,8 @@ import {
   snapElementToGrid,
   snapToGridLine,
   getAllParentContainers,
-  getXYRelativeToParent
+  getXYRelativeToParent,
+  getTotalTopLeftOffset
 } from "./utilities";
 import { gridBoxSize, snapToXY, snapToCustomXY } from "./mouse";
 
@@ -36,12 +37,16 @@ export default function createResizerGrip(element) {
 }
 
 function initResizing(e) {
-  const parentContainers = getFirstParentContainer(e.target, "rectangle");
+  const parentContainers = getAllParentContainers(e.target, "rectangle");
   console.log("allparents", parentContainers);
-  container = parentContainers;
+  container = parentContainers[0];
   dragGripEle = container.querySelector(".drag-grip");
   dragGripEle.style.opacity = "0";
 
+  if (container.classList.contains("rectangle")) {
+    const { offsetTop, offsetLeft } = getTotalTopLeftOffset(parentContainers);
+    console.log(offsetTop, offsetLeft);
+  }
   const dimension = getPixelDimensionFromGridArea(container, gridBoxSize);
   console.log("dimension", dimension);
 

@@ -9,20 +9,18 @@ export function getFirstParentContainer(element, className) {
   ) {
     element = element.parentNode;
   }
-  console.log(element);
   return element;
 }
 
 export function getAllParentContainers(element, className) {
   const parents = [];
-  // all all parents that has 'className', and stop iterate
-  // class="canvas" element
-  while (
-    element.classList.contains(className) &&
-    !element.classList.contains("canvas")
-  ) {
+  // traverse upwards to get all elements that has 'className',
+  // and stop when encounter class="canvas" element
+  while (!element.classList.contains("canvas")) {
+    if (element.classList.contains(className)) {
+      parents.push(element);
+    }
     element = element.parentNode;
-    parents.push(element);
   }
 
   return parents;
@@ -136,4 +134,20 @@ export function nestGridLines(container, gridBoxSize) {
 export function getXYRelativeToParent(container, { x, y }) {
   const { top, left } = getPixelDimensionFromGridArea(container, gridBoxSize);
   return { relativeX: x - left, relativeY: y - top };
+}
+
+export function getTotalTopLeftOffset(containers) {
+  let offsetTop = 0;
+  let offsetLeft = 0;
+
+  for (let index = 0; index < containers.length; index++) {
+    const { top, left } = getPixelDimensionFromGridArea(
+      containers[index],
+      gridBoxSize
+    );
+    offsetTop += top;
+    offsetLeft += left;
+  }
+
+  return { offsetTop, offsetLeft };
 }
