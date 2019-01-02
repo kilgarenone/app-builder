@@ -81,16 +81,17 @@ function initResizing(e) {
 }
 
 function handleContainerShapeSizing(e) {
-  console.log("snapX", snapX);
-  console.log("pageX", e.pageX);
-  const snapToGridX = snapToGridLine(e.pageX - offsetX, gridBoxSize);
-  const snapToGridY = snapToGridLine(e.pageY - offsetY, gridBoxSize);
+  const snapToGridX = snapToGridLine(e.pageX - offsetX, gridBoxSize) - snapX;
+  const snapToGridY = snapToGridLine(e.pageY - offsetY, gridBoxSize) - snapY;
 
-  container.style.width = `${Math.abs(snapToGridX - snapX)}px`;
-  container.style.height = `${Math.abs(snapToGridY - snapY)}px`;
-  container.style.left =
-    e.pageX - snapX < 0 ? `${snapToGridX}px` : `${snapX}px`;
-  container.style.top = e.pageY - snapY < 0 ? `${snapToGridY}px` : `${snapY}px`;
+  container.style.width = `${
+    snapToGridX < gridBoxSize ? gridBoxSize : snapToGridX
+  }px`;
+  container.style.height = `${
+    snapToGridY < gridBoxSize ? gridBoxSize : snapToGridY
+  }px`;
+  container.style.left = `${snapX}px`;
+  container.style.top = `${snapY}px`;
 }
 
 function handleStopResizing(e) {
