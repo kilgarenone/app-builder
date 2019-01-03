@@ -31,7 +31,13 @@ function handleMouseDown(e) {
 
 function handleMouseUp(e) {
   console.log("mouseup", e);
-  snapElementToGridFromDragging(e.pageX, e.pageY, container, gridBoxSize);
+  // minus 7.5 to account for mouse offset from the drag-grip area during mouseup
+  snapElementToGridFromDragging(
+    e.pageX - 7.5,
+    e.pageY - 7.5,
+    container,
+    gridBoxSize
+  );
   document.body.style.cursor = "default";
   // normalizeTransformToGrid(container, gridBoxSize);
   document.body.removeEventListener("mouseup", handleMouseUp, false);
