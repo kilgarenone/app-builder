@@ -1,5 +1,7 @@
 import { gridBoxSize } from "./mouse";
 
+let canvasEle;
+
 export function getFirstParentContainer(element, className) {
   // search until element that has 'className'
   while (!element.classList.contains(className)) {
@@ -94,18 +96,18 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
   const left = roundPixelToGridBoxes(x, gridBoxSize);
   const top = roundPixelToGridBoxes(y, gridBoxSize);
   const dropInContainer = document.elementFromPoint(left, top);
+  const parents = getAllParentContainers(dropInContainer, "rectangle");
+  const parent = getLastParentOrCanvasIfNoneExists(parents);
   console.log("dropincontainer", dropInContainer);
-  if (dropInContainer.id === "canvas") {
+  if (parent.id === "canvas") {
     snapElementToGridFromPixelDimension(element, gridBoxSize, {
       width,
       height,
       top,
       left
     });
-  } else if (dropInContainer.classList.contains("rectangle")) {
-    const parents = getAllParentContainers(dropInContainer, "rectangle");
-    const lastParent = parents[parents.length - 1];
-    const { relativeX, relativeY } = getXYRelativeToParent(lastParent, {
+  } else if (parent.classList.contains("rectangle")) {
+    const { relativeX, relativeY } = getXYRelativeToParent(parent, {
       x: left,
       y: top
     });
@@ -117,7 +119,7 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
     });
   }
   element.style.transform = "";
-  dropInContainer.appendChild(element);
+  parent.appendChild(element);
 }
 
 function getXYFromTransform(element) {
@@ -201,5 +203,5 @@ export function getTotalTopLeftOffset(containers) {
 export function getLastParentOrCanvasIfNoneExists(parents) {
   return parents.length
     ? parents[parents.length - 1]
-    : document.getElementById("canvas");
+    : canvasEle || document.getElementById("canvas");
 }
