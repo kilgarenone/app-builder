@@ -49,24 +49,29 @@ const ROUND = "round";
 export function snapElementToGridFromPixelDimension(
   element,
   gridBoxSize,
-  { top, left, width, height } = { top: 0, left: 0, width: 0, height: 0 }
+  customDimension = null
 ) {
-  const roundedTop = roundPixelToGridLine(
-    top || element.style.top,
-    gridBoxSize
-  );
-  const roundedLeft = roundPixelToGridLine(
-    left || element.style.left,
-    gridBoxSize
-  );
-  const roundedWidth = roundPixelToGridLine(
-    width || element.style.width || element.clientWidth,
-    gridBoxSize
-  );
-  const roundedHeight = roundPixelToGridLine(
-    height || element.style.height || element.clientHeight,
-    gridBoxSize
-  );
+  let top;
+  let left;
+  let width;
+  let height;
+
+  if (customDimension) {
+    top = customDimension.top;
+    left = customDimension.left;
+    width = customDimension.width;
+    height = customDimension.height;
+  } else {
+    top = element.style.top;
+    left = element.style.left;
+    width = element.style.width || element.clientWidth;
+    height = element.style.height || element.clientHeight;
+  }
+
+  const roundedTop = roundPixelToGridLine(top, gridBoxSize);
+  const roundedLeft = roundPixelToGridLine(left, gridBoxSize);
+  const roundedWidth = roundPixelToGridLine(width, gridBoxSize);
+  const roundedHeight = roundPixelToGridLine(height, gridBoxSize);
 
   element.style.gridRowStart = roundedTop + 1;
   element.style.gridColumnStart = roundedLeft + 1;
@@ -97,8 +102,6 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
       top,
       left
     });
-    element.style.transform = "";
-    dropInContainer.appendChild(element);
   } else if (dropInContainer.classList.contains("rectangle")) {
     const parents = getAllParentContainers(dropInContainer, "rectangle");
     const lastParent = parents[parents.length - 1];
@@ -112,9 +115,9 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
       top: relativeY,
       left: relativeX
     });
-    element.style.transform = "";
-    dropInContainer.appendChild(element);
   }
+  element.style.transform = "";
+  dropInContainer.appendChild(element);
 }
 
 function getXYFromTransform(element) {

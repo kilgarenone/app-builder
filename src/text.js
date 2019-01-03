@@ -77,9 +77,7 @@ function completeTextNodeCreation(e) {
 
   createResizerGrip(e.target.parentNode);
 
-  snapElementToGridFromPixelDimension(e.target.parentNode, gridBoxSize, {
-    snapBehaviour: CEIL
-  });
+  snapElementToGridFromPixelDimension(e.target.parentNode, gridBoxSize);
   e.target.onblur = e => e.target.setAttribute("spellcheck", false);
   // don't remove this well formed text node on next new
   // start point

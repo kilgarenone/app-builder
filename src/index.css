@@ -13,6 +13,11 @@
   cursor: nwse-resize;
 }
 
+.paragraph {
+  height: 100%;
+  width: 100%;
+}
+
 .paragraph:hover {
   cursor: text;
 }
