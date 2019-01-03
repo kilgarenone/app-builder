@@ -13,7 +13,6 @@ export function initDraw(canvas, gridBoxSize) {
       /* it was a double click */
       console.log("double click");
       positionStartPoint(e);
-      createTextNode(e);
     }
   };
 }

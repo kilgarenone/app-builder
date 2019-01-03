@@ -86,7 +86,7 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
   const top = roundPixelToGridBoxes(y, gridBoxSize);
   const dropInContainer = document.elementFromPoint(left, top);
   console.log("dropincontainer", dropInContainer);
-  if (dropInContainer.classList.contains("canvas")) {
+  if (dropInContainer.id === "canvas") {
     console.log({
       width,
       height,

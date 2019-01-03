@@ -18,9 +18,9 @@ let snapY;
 export function createTextNode(e) {
   // user has moved on to new start point, so removes
   // last text node that was unutilized
-  if (container) {
-    container.remove();
-  }
+  // if (container) {
+  //   container.remove();
+  // }
 
   const { x, y } = snapMouseXY(e);
   snapX = x;
@@ -59,6 +59,8 @@ export function createTextNode(e) {
   parent.appendChild(container);
 
   paragraph.focus();
+
+  return container;
 }
 
 function completeTextNodeCreation(e) {
@@ -81,5 +83,5 @@ function completeTextNodeCreation(e) {
   e.target.onblur = e => e.target.setAttribute("spellcheck", false);
   // don't remove this well formed text node on next new
   // start point
-  container = null;
+  // container = null;
 }

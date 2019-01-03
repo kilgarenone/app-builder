@@ -4,8 +4,10 @@ import {
 } from "./utilities";
 import createContainer, { completeContainerCreation } from "./container";
 import { snapMouseXY } from "./mouse";
+import { createTextNode } from "./text";
 
 let container;
+let paragraphContainer;
 let snapX;
 let snapY;
 export let startPointEle;
@@ -23,7 +25,7 @@ export function positionStartPoint(e) {
   const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
-
+  paragraphContainer = createTextNode(e);
   startPointEle.style.transform = `translate(${snapX - 10}px, ${snapY - 10}px)`;
   startPointEle.style.opacity = 1;
 }
@@ -37,12 +39,16 @@ function handleMouseUpOnStartPoint(e) {
     container.remove();
     return;
   }
+
   document.body.removeEventListener(
     "mouseup",
     handleMouseUpOnStartPoint,
     false
   );
 
+  if (!paragraphContainer.textContent) {
+    paragraphContainer.remove();
+  }
   completeContainerCreation(container);
 }
 
