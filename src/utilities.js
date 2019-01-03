@@ -35,8 +35,12 @@ export function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
   }
 }
 
-function roundPixelToGridBoxes(pixel, gridBoxSize, snapBehaviour = ROUND) {
+function roundPixelToGridLine(pixel, gridBoxSize, snapBehaviour = ROUND) {
   return Math[snapBehaviour](parseFloat(pixel) / gridBoxSize);
+}
+
+function roundPixelToGridBoxes(pixel, gridBoxSize) {
+  return gridBoxSize * Math.round(pixel / gridBoxSize);
 }
 
 const CEIL = "ceil";
@@ -47,19 +51,19 @@ export function snapElementToGridFromPixelDimension(
   gridBoxSize,
   { top, left, width, height } = { top: 0, left: 0, width: 0, height: 0 }
 ) {
-  const roundedTop = roundPixelToGridBoxes(
+  const roundedTop = roundPixelToGridLine(
     top || element.style.top,
     gridBoxSize
   );
-  const roundedLeft = roundPixelToGridBoxes(
+  const roundedLeft = roundPixelToGridLine(
     left || element.style.left,
     gridBoxSize
   );
-  const roundedWidth = roundPixelToGridBoxes(
+  const roundedWidth = roundPixelToGridLine(
     width || element.style.width || element.clientWidth,
     gridBoxSize
   );
-  const roundedHeight = roundPixelToGridBoxes(
+  const roundedHeight = roundPixelToGridLine(
     height || element.style.height || element.clientHeight,
     gridBoxSize
   );
@@ -99,6 +103,7 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
       top,
       left
     });
+    element.style.transform = "";
     dropInContainer.appendChild(element);
   }
 }
@@ -116,8 +121,8 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
     return;
   }
   console.log("offset", offset);
-  const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
-  const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
+  const offsetGridBoxesX = roundPixelToGridLine(offset[0], gridBoxSize);
+  const offsetGridBoxesY = roundPixelToGridLine(offset[1], gridBoxSize);
 
   element.style.gridRowStart = +element.style.gridRowStart + offsetGridBoxesY;
   element.style.gridColumnStart =
