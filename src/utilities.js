@@ -30,7 +30,7 @@ export function snapToGridLine(val, gridBoxSize, { force } = { force: false }) {
     return snapCandidate;
   }
 
-  if (Math.abs(val - snapCandidate) <= 10) {
+  if (Math.abs(val - snapCandidate) <= 5) {
     return snapCandidate;
   } else {
     return val;

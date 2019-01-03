@@ -23,14 +23,13 @@ function handleMouseDown(e) {
   for (let i = 0; i < container.childNodes.length; i++) {
     container.childNodes[i].style.pointerEvents = "none";
   }
-  console.log(container.childNodes);
   document.body.style.cursor = "move";
   document.body.addEventListener("mousemove", handleContainerDragging, false);
   document.body.addEventListener("mouseup", handleMouseUp, false);
 }
 
 function handleMouseUp(e) {
-  console.log("mouseup", e);
+  console.log("drag grip mouseup", e);
   // minus 7.5 to account for mouse offset from the drag-grip area during mouseup
   snapElementToGridFromDragging(
     e.pageX - 7.5,

@@ -1,6 +1,8 @@
 import {
   snapElementToGridFromPixelDimension,
-  snapToGridLine
+  snapToGridLine,
+  getAllParentContainers,
+  getLastParentOrCanvasIfNoneExists
 } from "./utilities";
 import { gridBoxSize, snapMouseXY } from "./mouse";
 import createDragGrip from "./dragGrip";
@@ -9,12 +11,21 @@ import createResizerGrip from "./resizerGrip";
 let container;
 let snapX;
 let snapY;
+let parentContainer;
+let isAppended = false;
 
-export default function createContainer(e, parentContainer) {
-  console.log("creating container in this parent container", parentContainer);
+export default function prepareContainerCreationProcess() {
+  document.body.addEventListener("mousedown", handleCreateContainer, false);
+}
+export function handleCreateContainer(e) {
+  isAppended = false;
   const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
+
+  const parents = getAllParentContainers(e.target, "rectangle");
+  parentContainer = getLastParentOrCanvasIfNoneExists(parents);
+
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
@@ -24,20 +35,21 @@ export default function createContainer(e, parentContainer) {
     handleContainerShapeSizing,
     false
   );
+  document.body.addEventListener("mouseup", handleContainerOnMouseUp, false);
+}
 
-  parentContainer.appendChild(container);
-
-  return container;
+function handleContainerOnMouseUp(e) {
+  // if cursor is still moving inside the start point region,
+  // don't create the container yet
+  if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
+    container.remove();
+    return;
+  }
 }
 
 // TODO: optimizes with requestAnimationFrame API
 export function handleContainerShapeSizing(e) {
-  // if cursor is still moving inside the start point region,
-  // don't create the container yet
-  if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
-    return;
-  }
-
+  parentContainer.appendChild(container);
   const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
   const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
 
@@ -58,5 +70,4 @@ export function completeContainerCreation(container) {
   createResizerGrip(container);
   snapElementToGridFromPixelDimension(container, gridBoxSize);
   document.body.style.cursor = "default";
-  console.log("div container creation finsihed.");
 }
