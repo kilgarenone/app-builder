@@ -91,17 +91,26 @@ export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
   const dropInContainer = document.elementFromPoint(left, top);
   console.log("dropincontainer", dropInContainer);
   if (dropInContainer.id === "canvas") {
-    console.log({
-      width,
-      height,
-      top,
-      left
-    });
     snapElementToGridFromPixelDimension(element, gridBoxSize, {
       width,
       height,
       top,
       left
+    });
+    element.style.transform = "";
+    dropInContainer.appendChild(element);
+  } else if (dropInContainer.classList.contains("rectangle")) {
+    const parents = getAllParentContainers(dropInContainer, "rectangle");
+    const lastParent = parents[parents.length - 1];
+    const { relativeX, relativeY } = getXYRelativeToParent(lastParent, {
+      x: left,
+      y: top
+    });
+    snapElementToGridFromPixelDimension(element, gridBoxSize, {
+      width,
+      height,
+      top: relativeY,
+      left: relativeX
     });
     element.style.transform = "";
     dropInContainer.appendChild(element);
