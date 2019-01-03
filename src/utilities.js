@@ -42,33 +42,65 @@ function roundPixelToGridBoxes(pixel, gridBoxSize, snapBehaviour = ROUND) {
 const CEIL = "ceil";
 const ROUND = "round";
 
-export function snapElementToGrid(element, gridBoxSize) {
-  const top = roundPixelToGridBoxes(element.style.top, gridBoxSize);
-  const left = roundPixelToGridBoxes(element.style.left, gridBoxSize);
-  const width = roundPixelToGridBoxes(
-    element.style.width || element.clientWidth,
+export function snapElementToGridFromPixelDimension(
+  element,
+  gridBoxSize,
+  { top, left, width, height } = { top: 0, left: 0, width: 0, height: 0 }
+) {
+  const roundedTop = roundPixelToGridBoxes(
+    top || element.style.top,
     gridBoxSize
   );
-  const height = roundPixelToGridBoxes(
-    element.style.height || element.clientHeight,
+  const roundedLeft = roundPixelToGridBoxes(
+    left || element.style.left,
+    gridBoxSize
+  );
+  const roundedWidth = roundPixelToGridBoxes(
+    width || element.style.width || element.clientWidth,
+    gridBoxSize
+  );
+  const roundedHeight = roundPixelToGridBoxes(
+    height || element.style.height || element.clientHeight,
     gridBoxSize
   );
 
-  const gridColumnStart = left + 1;
-  const gridColumnEnd = left + width + 1;
-  const gridRowStart = top + 1;
-  const gridRowEnd = top + height + 1;
-
-  element.style.gridRowStart = gridRowStart;
-  element.style.gridColumnStart = gridColumnStart;
-  element.style.gridRowEnd = gridRowEnd;
-  element.style.gridColumnEnd = gridColumnEnd;
+  element.style.gridRowStart = roundedTop + 1;
+  element.style.gridColumnStart = roundedLeft + 1;
+  element.style.gridRowEnd = roundedTop + roundedHeight + 1;
+  element.style.gridColumnEnd = roundedLeft + roundedWidth + 1;
 
   element.style.position = "relative";
   element.style.top = "";
   element.style.left = "";
   element.style.width = "";
   element.style.height = "";
+}
+
+// x, y will be the top-left coordinate
+export function snapElementToGridFromDragging(x, y, element, gridBoxSize) {
+  const { width, height } = getDimensionInPixelFromGridArea(
+    element,
+    gridBoxSize
+  );
+  const left = roundPixelToGridBoxes(x, gridBoxSize);
+  const top = roundPixelToGridBoxes(y, gridBoxSize);
+  const dropInContainer = document.elementFromPoint(left, top);
+  console.log("dropincontainer", dropInContainer);
+  if (dropInContainer.classList.contains("canvas")) {
+    console.log({
+      width,
+      height,
+      top,
+      left
+    });
+    snapElementToGridFromPixelDimension(element, gridBoxSize, {
+      width,
+      height,
+      top,
+      left
+    });
+    dropInContainer.appendChild(element);
+  }
 }
 
 function getXYFromTransform(element) {
@@ -83,6 +115,7 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
   if (!offset) {
     return;
   }
+  console.log("offset", offset);
   const offsetGridBoxesX = roundPixelToGridBoxes(offset[0], gridBoxSize);
   const offsetGridBoxesY = roundPixelToGridBoxes(offset[1], gridBoxSize);
 

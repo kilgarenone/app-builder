@@ -2,7 +2,8 @@ import { gridBoxSize, setMousePosition } from "./mouse";
 import {
   getFirstParentContainer,
   normalizeTransformToGrid,
-  snapToGridLine
+  snapToGridLine,
+  snapElementToGridFromDragging
 } from "./utilities";
 
 let container;
@@ -18,6 +19,11 @@ function handleMouseDown(e) {
   startX = x;
   startY = y;
   dragGrip.style.opacity = 1;
+  container.style.pointerEvents = "none";
+  for (let i = 0; i < container.childNodes.length; i++) {
+    container.childNodes[i].style.pointerEvents = "none";
+  }
+  console.log(container.childNodes);
   document.body.style.cursor = "move";
   document.body.addEventListener("mousemove", handleContainerDragging, false);
   document.body.addEventListener("mouseup", handleMouseUp, false);
@@ -25,14 +31,21 @@ function handleMouseDown(e) {
 
 function handleMouseUp(e) {
   console.log("mouseup", e);
+  snapElementToGridFromDragging(e.pageX, e.pageY, container, gridBoxSize);
   document.body.style.cursor = "default";
-  normalizeTransformToGrid(container, gridBoxSize);
+  // normalizeTransformToGrid(container, gridBoxSize);
   document.body.removeEventListener("mouseup", handleMouseUp, false);
   document.body.removeEventListener(
     "mousemove",
     handleContainerDragging,
     false
   );
+
+  // removes pointer-events's none value
+  container.style.pointerEvents = "";
+  for (let i = 0; i < container.childNodes.length; i++) {
+    container.childNodes[i].style.pointerEvents = "";
+  }
 
   dragGrip.style.opacity = "";
 }

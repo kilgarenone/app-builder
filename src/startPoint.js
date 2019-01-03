@@ -3,7 +3,7 @@ import {
   getLastParentOrCanvasIfNoneExists
 } from "./utilities";
 import createContainer, { completeContainerCreation } from "./container";
-import { snapToXY } from "./mouse";
+import { snapMouseXY } from "./mouse";
 
 let container;
 let snapX;
@@ -20,7 +20,7 @@ export function initStartPoint() {
 }
 
 export function positionStartPoint(e) {
-  const { x, y } = snapToXY(e);
+  const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
 

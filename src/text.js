@@ -1,7 +1,7 @@
-import { CEIL, gridBoxSize, snapToXY } from "./mouse";
+import { CEIL, gridBoxSize, snapMouseXY } from "./mouse";
 import {
   getFirstParentContainer,
-  snapElementToGrid,
+  snapElementToGridFromPixelDimension,
   nestGridLines,
   getXYRelativeToParent,
   getAllParentContainers,
@@ -22,11 +22,10 @@ export function createTextNode(e) {
     container.remove();
   }
 
-  const { x, y } = snapToXY(e);
+  const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
 
-  // TODO: try get last parent container instead
   const parents = getAllParentContainers(e.target, "rectangle");
   const parent = getLastParentOrCanvasIfNoneExists(parents);
   if (parents.length) {
@@ -76,7 +75,7 @@ function completeTextNodeCreation(e) {
 
   createResizerGrip(e.target.parentNode);
 
-  snapElementToGrid(e.target.parentNode, gridBoxSize, {
+  snapElementToGridFromPixelDimension(e.target.parentNode, gridBoxSize, {
     snapBehaviour: CEIL
   });
   e.target.onblur = e => e.target.setAttribute("spellcheck", false);

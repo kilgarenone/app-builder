@@ -7,7 +7,7 @@ export function setMousePosition(e) {
   };
 }
 
-export function snapToXY(e) {
+export function snapMouseXY(e) {
   const x = snapToGridLine(e.pageX + window.pageXOffset, gridBoxSize, {
     force: true
   });

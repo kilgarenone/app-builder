@@ -2,7 +2,7 @@ import { gridBoxSize } from "./mouse";
 import {
   getAllParentContainers,
   getDimensionInPixelFromGridArea,
-  snapElementToGrid,
+  snapElementToGridFromPixelDimension,
   snapToGridLine
 } from "./utilities";
 
@@ -95,7 +95,7 @@ function handleContainerShapeSizing(e) {
 function handleStopResizing(e) {
   document.body.style.cursor = "default";
   dragGripEle.style.opacity = "";
-  snapElementToGrid(container, gridBoxSize);
+  snapElementToGridFromPixelDimension(container, gridBoxSize);
   document.body.removeEventListener(
     "mousemove",
     handleContainerShapeSizing,

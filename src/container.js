@@ -1,5 +1,8 @@
-import { snapElementToGrid, snapToGridLine } from "./utilities";
-import { gridBoxSize, snapToXY } from "./mouse";
+import {
+  snapElementToGridFromPixelDimension,
+  snapToGridLine
+} from "./utilities";
+import { gridBoxSize, snapMouseXY } from "./mouse";
 import createDragGrip from "./dragGrip";
 import createResizerGrip from "./resizerGrip";
 
@@ -8,8 +11,8 @@ let snapX;
 let snapY;
 
 export default function createContainer(e, parentContainer) {
-  console.log("div container creation begun.", parentContainer);
-  const { x, y } = snapToXY(e);
+  console.log("creating container in this parent container", parentContainer);
+  const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
   container = document.createElement("div");
@@ -53,7 +56,7 @@ export function completeContainerCreation(container) {
   );
   createDragGrip(container);
   createResizerGrip(container);
-  snapElementToGrid(container, gridBoxSize);
+  snapElementToGridFromPixelDimension(container, gridBoxSize);
   document.body.style.cursor = "default";
   console.log("div container creation finsihed.");
 }
