@@ -46,12 +46,12 @@ export function createTextNode(e) {
   const paragraph = document.createElement("p");
   paragraph.className = "paragraph";
   paragraph.contentEditable = true;
-  paragraph.style.transform = "scale(0, 0)";
-  paragraph.oninput = () => {
-    paragraph.style.transform = "scale(1, 1)";
-    startPointEle.style.opacity = 0;
-    paragraph.oninput = null;
-  };
+  // paragraph.style.transform = "scale(0, 0)";
+  // paragraph.oninput = () => {
+  //   paragraph.style.transform = "scale(1, 1)";
+  //   startPointEle.style.opacity = 0;
+  //   paragraph.oninput = null;
+  // };
   paragraph.onblur = completeTextNodeCreation;
 
   container.appendChild(paragraph);

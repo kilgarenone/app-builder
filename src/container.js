@@ -13,16 +13,22 @@ let snapX;
 let snapY;
 let parentContainer;
 let isAppended = false;
+let reallyCreateContainerTimeout;
 
 export default function prepareContainerCreationProcess() {
-  document.body.addEventListener("mousedown", handleCreateContainer, false);
+  document.body.addEventListener("mousedown", handleContainerCreation, false);
+  document.body.addEventListener("click", handleTextCreation, false);
 }
-export function handleCreateContainer(e) {
-  isAppended = false;
-  const { x, y } = snapMouseXY(e);
-  snapX = x;
-  snapY = y;
 
+function handleTextCreation(e) {
+  clearTimeout(reallyCreateContainerTimeout);
+  if (e.detail === 2) {
+    clearTimeout(reallyCreateContainerTimeout);
+  }
+}
+
+function initContainerCreationProcess(e) {
+  console.log("initContainerCreationProcess");
   const parents = getAllParentContainers(e.target, "rectangle");
   parentContainer = getLastParentOrCanvasIfNoneExists(parents);
 
@@ -38,18 +44,29 @@ export function handleCreateContainer(e) {
   document.body.addEventListener("mouseup", handleContainerOnMouseUp, false);
 }
 
-function handleContainerOnMouseUp(e) {
-  // if cursor is still moving inside the start point region,
-  // don't create the container yet
-  if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
-    container.remove();
-    return;
-  }
+export function handleContainerCreation(e) {
+  isAppended = false;
+  const { x, y } = snapMouseXY(e);
+  snapX = x;
+  snapY = y;
+
+  reallyCreateContainerTimeout = setTimeout(
+    () => initContainerCreationProcess.call(null, e),
+    300
+  );
 }
 
 // TODO: optimizes with requestAnimationFrame API
 export function handleContainerShapeSizing(e) {
-  parentContainer.appendChild(container);
+  // if cursor is still moving inside the start point region,
+  // don't create the container yet
+  if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
+    return;
+  }
+  if (!isAppended) {
+    parentContainer.appendChild(container);
+    isAppended = true;
+  }
   const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
   const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
 
@@ -60,12 +77,20 @@ export function handleContainerShapeSizing(e) {
   container.style.top = e.pageY - snapY < 0 ? `${snapToGridY}px` : `${snapY}px`;
 }
 
-export function completeContainerCreation(container) {
+export function handleContainerOnMouseUp(e) {
   document.body.removeEventListener(
     "mousemove",
     handleContainerShapeSizing,
     false
   );
+  document.body.removeEventListener("mouseup", handleContainerOnMouseUp, false);
+
+  // if cursor is still moving inside the start point region,
+  // don't create the container yet
+  if (Math.abs(e.pageX - snapX) <= 10 || Math.abs(e.pageY - snapY) <= 10) {
+    return;
+  }
+
   createDragGrip(container);
   createResizerGrip(container);
   snapElementToGridFromPixelDimension(container, gridBoxSize);

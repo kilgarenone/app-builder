@@ -6,13 +6,4 @@ import { createTextNode } from "./text";
 export function initDraw(canvas, gridBoxSize) {
   initStartPoint();
   setGridBoxSize(gridBoxSize);
-
-  /* Distinguish single click or double click */
-  canvas.onclick = e => {
-    if (e.detail === 2) {
-      /* it was a double click */
-      console.log("double click");
-      positionStartPoint(e);
-    }
-  };
 }

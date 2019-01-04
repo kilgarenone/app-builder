@@ -14,11 +14,11 @@ export let startPointEle;
 
 export function initStartPoint() {
   startPointEle = document.getElementById("startPoint");
-  document.body.addEventListener(
-    "mousemove",
-    handleStartPointOnMouseMove,
-    false
-  );
+  // document.body.addEventListener(
+  //   "mousemove",
+  //   handleStartPointOnMouseMove,
+  //   false
+  // );
   prepareContainerCreationProcess();
 
   // startPointEle.addEventListener(
