@@ -28,6 +28,7 @@ export default function createTextNode(e) {
 
   const parents = getAllParentContainers(e.target, "rectangle");
   const parent = getLastParentOrCanvasIfNoneExists(parents);
+
   if (parents.length) {
     const { relativeX, relativeY } = getXYRelativeToParent(parent, {
       x: snapX,
@@ -37,6 +38,7 @@ export default function createTextNode(e) {
     snapY = relativeY;
     nestGridLines(parent, gridBoxSize);
   }
+
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
@@ -59,8 +61,6 @@ export default function createTextNode(e) {
   parent.appendChild(container);
 
   paragraph.focus();
-
-  return container;
 }
 
 function completeTextNodeCreation(e) {

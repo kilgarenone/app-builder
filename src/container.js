@@ -41,6 +41,8 @@ function initContainerCreationProcess(e) {
   container.className = "rectangle";
   container.style.position = "absolute";
 
+  document.body.style.cursor = "crosshair";
+
   document.body.addEventListener(
     "mousemove",
     handleContainerShapeSizing,
@@ -56,6 +58,7 @@ export function handleContainerCreation(e) {
   snapX = x;
   snapY = y;
 
+  // TODO: revisit this implementation
   reallyCreateContainerTimeout = setTimeout(
     () => initContainerCreationProcess.call(null, e),
     200
