@@ -134,7 +134,6 @@ export function normalizeTransformToGrid(element, gridBoxSize) {
   if (!offset) {
     return;
   }
-  console.log("offset", offset);
   const offsetGridBoxesX = roundPixelToGridLine(offset[0], gridBoxSize);
   const offsetGridBoxesY = roundPixelToGridLine(offset[1], gridBoxSize);
 

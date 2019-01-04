@@ -12,7 +12,9 @@ let startX;
 let startY;
 
 function handleMouseDown(e) {
-  console.log("Clicked drag anchor ");
+  // prevents this mousedown event from propagating to
+  // document.body's mousedown handler
+  e.stopPropagation();
   container = getFirstParentContainer(e.target, "rectangle");
   dragGrip = e.target;
   const { x, y } = setMousePosition(e);

@@ -36,10 +36,12 @@ export default function createResizerGrip(element) {
 }
 
 function initResizing(e) {
+  // prevents this mousedown event from propagating to
+  // document.body's mousedown handler
+  e.stopPropagation();
   const parents = getAllParentContainers(e.target, "rectangle");
-  console.log("eeeee", parents);
+  console.log("initResizing parents", parents);
   container = parents[0];
-  console.log("container", container);
   dragGripEle = container.querySelector(".drag-grip");
   dragGripEle.style.opacity = "0";
   offsetX = 0;

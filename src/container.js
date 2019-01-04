@@ -7,13 +7,14 @@ import {
 import { gridBoxSize, snapMouseXY } from "./mouse";
 import createDragGrip from "./dragGrip";
 import createResizerGrip from "./resizerGrip";
+import createTextNode from "./text";
 
 let container;
 let snapX;
 let snapY;
 let parentContainer;
 let isAppended = false;
-let reallyCreateContainerTimeout;
+let reallyCreateContainerTimeout = null;
 
 export default function prepareContainerCreationProcess() {
   document.body.addEventListener("mousedown", handleContainerCreation, false);
@@ -21,9 +22,13 @@ export default function prepareContainerCreationProcess() {
 }
 
 function handleTextCreation(e) {
-  clearTimeout(reallyCreateContainerTimeout);
-  if (e.detail === 2) {
+  if (reallyCreateContainerTimeout) {
     clearTimeout(reallyCreateContainerTimeout);
+    reallyCreateContainerTimeout = null;
+  }
+
+  if (e.detail === 2) {
+    createTextNode(e);
   }
 }
 
@@ -45,6 +50,7 @@ function initContainerCreationProcess(e) {
 }
 
 export function handleContainerCreation(e) {
+  console.log("handleContainerCreation", e);
   isAppended = false;
   const { x, y } = snapMouseXY(e);
   snapX = x;
@@ -52,7 +58,7 @@ export function handleContainerCreation(e) {
 
   reallyCreateContainerTimeout = setTimeout(
     () => initContainerCreationProcess.call(null, e),
-    300
+    200
   );
 }
 

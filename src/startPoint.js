@@ -4,7 +4,7 @@ import {
 } from "./utilities";
 import prepareContainerCreationProcess from "./container";
 import { snapMouseXY } from "./mouse";
-import { createTextNode } from "./text";
+import createTextNode from "./text";
 
 let container;
 let paragraphContainer;
@@ -19,7 +19,6 @@ export function initStartPoint() {
   //   handleStartPointOnMouseMove,
   //   false
   // );
-  prepareContainerCreationProcess();
 
   // startPointEle.addEventListener(
   //   "mousedown",
