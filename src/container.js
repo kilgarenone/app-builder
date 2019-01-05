@@ -15,8 +15,10 @@ let snapY;
 let parentContainer;
 let isAppended = false;
 let reallyCreateContainerTimeout = null;
+let observer;
 
-export default function prepareContainerCreationProcess() {
+export default function prepareContainerCreationProcess(observerFn) {
+  observer = observerFn;
   document.body.addEventListener("mousedown", handleContainerCreation, false);
   document.body.addEventListener("click", handleTextCreation, false);
 }
@@ -41,6 +43,7 @@ function initContainerCreationProcess(e) {
   container.className = "rectangle";
   container.style.position = "absolute";
 
+  container.addEventListener("click", observer, false);
   document.body.style.cursor = "crosshair";
 
   document.body.addEventListener(
