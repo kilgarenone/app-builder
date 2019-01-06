@@ -15,11 +15,11 @@
 }
 
 .rectangle {
-  border: 1px solid #ff0000;
+  border: 1px solid blue;
 }
 
 .rectangle:hover {
-  border-width: 3px;
+  outline: 3px solid blue;
 }
 
 .resizer-grip {

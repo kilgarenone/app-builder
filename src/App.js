@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { initDraw } from "./draw";
 import prepareContainerCreationProcess from "./container";
 import { setGridBoxSize } from "./mouse";
+import BorderRadius from "./components/BorderRadius";
 
 class App extends Component {
   constructor(props) {
@@ -25,7 +26,8 @@ class App extends Component {
   };
 
   mutateElementProperties = ({ prop, value }) => {
-    this.activeElement.style[prop] = value;
+    console.log("prop", this.activeElement);
+    this.activeElement.target.style[prop] = value;
   };
 
   render() {
@@ -61,7 +63,7 @@ class App extends Component {
           {/* <div id="startPoint" /> */}
         </div>
         <div id="controller-sidebar">
-          <div>hello world</div>
+          <BorderRadius onPropChange={this.mutateElementProperties} />
         </div>
       </>
     );

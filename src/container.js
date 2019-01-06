@@ -29,6 +29,10 @@ function handleTextCreation(e) {
     reallyCreateContainerTimeout = null;
   }
 
+  if (e.target.className === "rectangle") {
+    observer(e);
+  }
+
   if (e.detail === 2) {
     createTextNode(e);
   }
@@ -43,7 +47,6 @@ function initContainerCreationProcess(e) {
   container.className = "rectangle";
   container.style.position = "absolute";
 
-  container.addEventListener("click", observer, false);
   document.body.style.cursor = "crosshair";
 
   document.body.addEventListener(
