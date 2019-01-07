@@ -2,7 +2,9 @@ import {
   snapElementToGridFromPixelDimension,
   snapToGridLine,
   getAllParentContainers,
-  getLastParentOrCanvasIfNoneExists
+  getLastParentOrCanvasIfNoneExists,
+  nestGridLines,
+  getXYRelativeToParent
 } from "./utilities";
 import { gridBoxSize, snapMouseXY } from "./mouse";
 import createDragGrip from "./dragGrip";
@@ -12,7 +14,9 @@ import createTextNode from "./text";
 let container;
 let snapX;
 let snapY;
-let parentContainer;
+let relativeSnapX;
+let relativeSnapY;
+let parent;
 let isAppended = false;
 let reallyCreateContainerTimeout = null;
 let observer;
@@ -41,8 +45,17 @@ function handleTextCreation(e) {
 function initContainerCreationProcess(e) {
   console.log("initContainerCreationProcess");
   const parents = getAllParentContainers(e.target, "rectangle");
-  parentContainer = getLastParentOrCanvasIfNoneExists(parents);
+  parent = getLastParentOrCanvasIfNoneExists(parents);
 
+  if (parents.length) {
+    const { relativeX, relativeY } = getXYRelativeToParent(parent, {
+      x: snapX,
+      y: snapY
+    });
+    relativeSnapX = relativeX;
+    relativeSnapY = relativeY;
+    nestGridLines(parent, gridBoxSize);
+  }
   container = document.createElement("div");
   container.className = "rectangle";
   container.style.position = "absolute";
@@ -63,6 +76,8 @@ export function handleContainerCreation(e) {
   const { x, y } = snapMouseXY(e);
   snapX = x;
   snapY = y;
+  relativeSnapX = x;
+  relativeSnapY = y;
 
   // TODO: revisit this implementation
   reallyCreateContainerTimeout = setTimeout(
@@ -79,17 +94,20 @@ export function handleContainerShapeSizing(e) {
     return;
   }
   if (!isAppended) {
-    parentContainer.appendChild(container);
+    parent.appendChild(container);
     isAppended = true;
   }
-  const snapToGridX = snapToGridLine(e.pageX, gridBoxSize);
-  const snapToGridY = snapToGridLine(e.pageY, gridBoxSize);
+  const snapToGridX = snapToGridLine(e.pageX, gridBoxSize) - snapX;
+  const snapToGridY = snapToGridLine(e.pageY, gridBoxSize) - snapY;
 
-  container.style.width = `${Math.abs(snapToGridX - snapX)}px`;
-  container.style.height = `${Math.abs(snapToGridY - snapY)}px`;
-  container.style.left =
-    e.pageX - snapX < 0 ? `${snapToGridX}px` : `${snapX}px`;
-  container.style.top = e.pageY - snapY < 0 ? `${snapToGridY}px` : `${snapY}px`;
+  container.style.width = `${
+    snapToGridX < gridBoxSize ? gridBoxSize : snapToGridX
+  }px`;
+  container.style.height = `${
+    snapToGridY < gridBoxSize ? gridBoxSize : snapToGridY
+  }px`;
+  container.style.left = `${relativeSnapX}px`;
+  container.style.top = `${relativeSnapY}px`;
 }
 
 export function handleContainerOnMouseUp(e) {

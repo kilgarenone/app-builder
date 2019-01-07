@@ -12,9 +12,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const gridBoxSize = Math.round(
-      (window.innerWidth - 200) / this.numberOfGridLines
-    );
+    const gridBoxSize = Math.round(window.innerWidth / this.numberOfGridLines);
     this.setState({ gridBoxSize });
     prepareContainerCreationProcess(this.observeElement);
     setGridBoxSize(gridBoxSize);
@@ -62,9 +60,9 @@ class App extends Component {
           />
           {/* <div id="startPoint" /> */}
         </div>
-        <div id="controller-sidebar">
+        {/* <div id="controller-sidebar">
           <BorderRadius onPropChange={this.mutateElementProperties} />
-        </div>
+        </div> */}
       </>
     );
   }
