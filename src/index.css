@@ -19,7 +19,7 @@
 }
 
 .rectangle:hover {
-  outline: 3px solid blue;
+  /* outline: 3px solid blue; */
 }
 
 .resizer-grip {
